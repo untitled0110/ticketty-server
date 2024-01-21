@@ -1,20 +1,23 @@
 package com.ticketty.tickettyapp.dto.email;
 
 public class MailResponse {
-    private boolean result;
-    private String emailToken;
+    private boolean success;
+    private String error;
 
-    public MailResponse(boolean result, String emailToken) {
-        this.result = result;
-        this.emailToken = emailToken;
+    public MailResponse() {
     }
 
-    public boolean isResult() {
-        return result;
+    public MailResponse(boolean success, String error) {
+        this.success = success;
+        this.error = error;
     }
 
-    public String getEmailToken() {
-        return emailToken;
+    public boolean isSuccess() {
+        return success;
+    }
+
+    public String getError() {
+        return error;
     }
 }
 

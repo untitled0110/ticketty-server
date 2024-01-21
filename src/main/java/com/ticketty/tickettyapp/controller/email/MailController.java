@@ -3,6 +3,7 @@ package com.ticketty.tickettyapp.controller.email;
 import com.ticketty.tickettyapp.dto.email.MailRequest;
 import com.ticketty.tickettyapp.dto.email.MailResponse;
 import com.ticketty.tickettyapp.service.email.MailService;
+import com.ticketty.tickettyapp.util.EmailValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,11 +14,19 @@ import org.springframework.web.bind.annotation.*;
 public class MailController {
 
     private final MailService mailService;
+    private final EmailValidator validator;
+
     @PostMapping("/verification-codes")
     public ResponseEntity<MailResponse> sendMail(@RequestBody MailRequest request) {
+
+        if (!validator.test(request.getEmail())) {
+            MailResponse validationErrorResponse = new MailResponse(false, "VALIDATION");
+            return ResponseEntity.badRequest().body(validationErrorResponse);
+        }
+
         MailResponse response = mailService.sendMail(request);
 
-        if (response.isResult()) {
+        if (response.isSuccess()) {
             return ResponseEntity.ok(response);
         } else {
             // 여기서 실패에 대한 응답을 처리하거나 다른 HttpStatus 코드를 사용할 수 있습니다.
