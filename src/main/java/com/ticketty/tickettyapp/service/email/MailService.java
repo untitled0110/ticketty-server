@@ -4,6 +4,7 @@ import com.ticketty.tickettyapp.dto.email.MailRequest;
 import com.ticketty.tickettyapp.dto.email.MailResponse;
 import com.ticketty.tickettyapp.util.RedisUtil;
 import com.ticketty.tickettyapp.repository.user.UserJdbcRepository;
+import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
@@ -24,10 +25,10 @@ public class MailService {
         this.redisUtil = redisUtil;
     }
 
-    public MailResponse sendMail(MailRequest request) {
+    public MailResponse sendMail(MailRequest request) throws MailException {
         // 이미 가입된 email일 경우
         if (!userJdbcRepository.isUserNotExist(request.getEmail())) {
-            return new MailResponse(false, "null");
+            return new MailResponse(false, "DUPLICATION");
         }
 
         String token = generateRandomNumber();
@@ -38,7 +39,7 @@ public class MailService {
         // Redis에 데이터 저장
         redisUtil.setDataExpire(request.getEmail(), token, 120);
 
-        return new MailResponse(true, token);
+        return new MailResponse(true, null);
     }
 
     private String generateRandomNumber() {
