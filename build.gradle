@@ -34,6 +34,9 @@ dependencies {
 
 	// redis
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
+	//encryption
+	implementation 'org.springframework.security:spring-security-crypto:5.1.5.RELEASE'
 }
 
 tasks.named('test') {

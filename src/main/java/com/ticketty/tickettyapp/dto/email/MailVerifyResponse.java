@@ -1,13 +1,14 @@
 package com.ticketty.tickettyapp.dto.email;
 
-public class MailResponse {
+public class MailVerifyResponse {
+
     private boolean success;
     private String error;
 
-    public MailResponse() {
+    public MailVerifyResponse() {
     }
 
-    public MailResponse(boolean success, String error) {
+    public MailVerifyResponse(boolean success, String error) {
         this.success = success;
         this.error = error;
     }
@@ -19,5 +20,5 @@ public class MailResponse {
     public String getError() {
         return error;
     }
-}
 
+}
