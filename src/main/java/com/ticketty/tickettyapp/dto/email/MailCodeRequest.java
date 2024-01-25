@@ -1,6 +1,6 @@
 package com.ticketty.tickettyapp.dto.email;
 
-public class MailRequest {
+public class MailCodeRequest {
 
     private String email;
 
