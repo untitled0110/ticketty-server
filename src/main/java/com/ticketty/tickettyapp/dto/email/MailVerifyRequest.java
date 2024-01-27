@@ -1,11 +1,17 @@
-package com.ticketty.tickettyapp.dto.user;
+package com.ticketty.tickettyapp.dto.email;
 
-public class UserCreateRequest {
+public class MailVerifyRequest {
+
     private String email;
+    private String code;
     private String password;
 
     public String getEmail() {
         return email;
+    }
+
+    public String getCode() {
+        return code;
     }
 
     public String getPassword() {
