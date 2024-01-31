@@ -3,7 +3,7 @@ package com.ticketty.tickettyapp.dto.email;
 public class MailCodeResponse {
     private boolean success;
     private String error;
-    private String code;
+    private Result result;
 
     public MailCodeResponse() {
     }
@@ -11,7 +11,7 @@ public class MailCodeResponse {
     public MailCodeResponse(String code, boolean success, String error) {
         this.success = success;
         this.error = error;
-        this.code = code;
+        this.result = new Result(code);
     }
 
     public boolean isSuccess() {
@@ -22,7 +22,19 @@ public class MailCodeResponse {
         return error;
     }
 
-    public String getCode() {
-        return code;
+    public Result getResult() {
+        return result;
+    }
+
+    public static class Result {
+        private String code;
+
+        public Result(String code) {
+            this.code = code;
+        }
+
+        public String getCode() {
+            return code;
+        }
     }
 }

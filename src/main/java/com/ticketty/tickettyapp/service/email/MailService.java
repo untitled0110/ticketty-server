@@ -41,10 +41,10 @@ public class MailService {
         javaMailSender.send(message);
 
         // Redis에 데이터 저장
-        redisUtil.setDataExpire(request.getEmail(), code, 60);
+        redisUtil.setDataExpire(request.getEmail(), code, 600);
         System.out.println("token: "+ code);
 
-        return new MailCodeResponse(code, true, "NULL");
+        return new MailCodeResponse(code, true, "null");
     }
 
     private String generateRandomNumber() {

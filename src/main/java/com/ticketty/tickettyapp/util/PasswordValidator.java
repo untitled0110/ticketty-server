@@ -9,8 +9,8 @@ import java.util.regex.Pattern;
 @Service
 public class PasswordValidator implements Predicate<String> {
 
-    // 최소 8자 이상, 영문 소문자, 숫자, 특수문자 최소 1개 이상 포함
-    private static final String PASSWORD_REGEX = "^(?=.*[a-z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$";
+    // 영문 1개이상, 숫자 1개이상, 특수문자 !@#$%^*+=- 중에 1개이상, 8~ 15자
+    private static final String PASSWORD_REGEX = "^(?=.*[A-Za-z])(?=.*[0-9])(?=.*[!@#$%^*+=-]).{8,15}$";
 
     @Override
     public boolean test(String password) {
