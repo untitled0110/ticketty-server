@@ -8,6 +8,7 @@ import com.ticketty.tickettyapp.service.email.MailService;
 import com.ticketty.tickettyapp.util.EmailValidator;
 import com.ticketty.tickettyapp.util.PasswordValidator;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -50,6 +51,12 @@ public class MailController {
 
         // 이메일 인증 성공 시 회원가입 시도
         MailVerifyResponse signUpResponse = mailService.signUpUser(request);
-        return ResponseEntity.ok(signUpResponse);
+        if (signUpResponse.isSuccess()) {
+            // 회원가입 성공 시
+            return ResponseEntity.ok(signUpResponse);
+        } else {
+            // 회원가입 실패 시
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(signUpResponse);
+        }
     }
 }
