@@ -1,38 +1,26 @@
-package com.ticketty.tickettyapp.controller.email;
+package com.ticketty.tickettyapp.controller;
 
-import com.ticketty.tickettyapp.dto.email.MailCodeRequest;
-import com.ticketty.tickettyapp.dto.email.MailCodeResponse;
-import com.ticketty.tickettyapp.dto.email.MailVerifyRequest;
-import com.ticketty.tickettyapp.dto.email.MailVerifyResponse;
-import com.ticketty.tickettyapp.service.email.MailService;
-import com.ticketty.tickettyapp.util.EmailValidator;
+import com.ticketty.tickettyapp.controller.request.MailVerifyRequest;
+import com.ticketty.tickettyapp.controller.response.MailVerifyResponse;
+import com.ticketty.tickettyapp.service.MailService;
+import com.ticketty.tickettyapp.service.UserService;
 import com.ticketty.tickettyapp.util.PasswordValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api")
-public class MailController {
+public class UserController {
 
     private final MailService mailService;
-    private final EmailValidator emailValidator;
+    private final UserService userService;
     private final PasswordValidator passwordValidator;
-
-    @PostMapping("/email/codes")
-    public ResponseEntity<MailCodeResponse> sendMail(@RequestBody MailCodeRequest request) {
-
-        if (!emailValidator.test(request.getEmail())) {
-            MailCodeResponse validationErrorResponse = new MailCodeResponse("null", false, "EMAIL_VALIDATION");
-            return ResponseEntity.ok(validationErrorResponse);
-        }
-
-        MailCodeResponse response = mailService.sendMail(request);
-
-        return ResponseEntity.ok(response);
-    }
 
     @PostMapping("/user/signup")
     public ResponseEntity<MailVerifyResponse> verifyMailAndSignup(@RequestBody MailVerifyRequest request) {
@@ -50,8 +38,9 @@ public class MailController {
         }
 
         // 이메일 인증 성공 시 회원가입 시도
-        MailVerifyResponse signUpResponse = mailService.signUpUser(request);
-        if (signUpResponse.isSuccess()) {
+        MailVerifyResponse signUpResponse = userService.signUpUser(request);
+
+        if (signUpResponse.isSuccess() || "DUPLICATION".equals(signUpResponse.getError())) {
             // 회원가입 성공 시
             return ResponseEntity.ok(signUpResponse);
         } else {
@@ -59,4 +48,5 @@ public class MailController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(signUpResponse);
         }
     }
+
 }

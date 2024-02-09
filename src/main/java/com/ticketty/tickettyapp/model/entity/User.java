@@ -1,4 +1,4 @@
-package com.ticketty.tickettyapp.domain;
+package com.ticketty.tickettyapp.model.entity;
 
 import javax.persistence.*;
 

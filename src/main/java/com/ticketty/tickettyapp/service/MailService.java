@@ -1,18 +1,15 @@
-package com.ticketty.tickettyapp.service.email;
+package com.ticketty.tickettyapp.service;
 
-import com.ticketty.tickettyapp.dto.email.MailCodeRequest;
-import com.ticketty.tickettyapp.dto.email.MailCodeResponse;
-import com.ticketty.tickettyapp.dto.email.MailVerifyRequest;
-import com.ticketty.tickettyapp.dto.email.MailVerifyResponse;
-import com.ticketty.tickettyapp.service.user.UserService;
-import com.ticketty.tickettyapp.util.Encryption;
+import com.ticketty.tickettyapp.controller.request.MailCodeRequest;
+import com.ticketty.tickettyapp.controller.response.MailCodeResponse;
+import com.ticketty.tickettyapp.controller.request.MailVerifyRequest;
+import com.ticketty.tickettyapp.controller.response.MailVerifyResponse;
 import com.ticketty.tickettyapp.util.RedisUtil;
-import com.ticketty.tickettyapp.repository.user.UserJdbcRepository;
+import com.ticketty.tickettyapp.repository.UserJdbcRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
@@ -23,7 +20,6 @@ public class MailService {
     private final UserJdbcRepository userJdbcRepository;
     private final RedisUtil redisUtil;
     private final JavaMailSender javaMailSender;
-    private final Encryption encryption;
 
 
     @Value("${mail.sender-email}")
@@ -84,24 +80,5 @@ public class MailService {
         return new MailVerifyResponse(true, "VERIFIED");
     }
 
-    @Transactional
-    public MailVerifyResponse signUpUser(MailVerifyRequest request) {
-        // 이미 가입된 email일 경우
-        if (!userJdbcRepository.isUserNotExist(request.getEmail())) {
-            return new MailVerifyResponse(false, "DUPLICATION");
-        }
 
-        // 패스워드 암호화
-        String hashedPassword = encryption.encode(request.getPassword());
-
-        boolean signUpSuccess = userJdbcRepository.saveUser(request.getEmail(), hashedPassword);
-
-        if (signUpSuccess) {
-            // 회원가입 성공
-            return new MailVerifyResponse(true, null);
-        } else {
-            // 회원가입 실패 시 오류 메시지 반환
-            return new MailVerifyResponse(false, "SIGNUP_FAILED");
-        }
-    }
 }

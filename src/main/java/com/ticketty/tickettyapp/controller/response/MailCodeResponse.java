@@ -1,4 +1,4 @@
-package com.ticketty.tickettyapp.dto.email;
+package com.ticketty.tickettyapp.controller.response;
 
 public class MailCodeResponse {
     private boolean success;

@@ -1,4 +1,4 @@
-package com.ticketty.tickettyapp.repository.user;
+package com.ticketty.tickettyapp.repository;
 
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
