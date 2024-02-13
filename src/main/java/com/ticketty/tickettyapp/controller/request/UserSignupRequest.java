@@ -5,10 +5,9 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class MailCodeRequest {
+public class UserSignupRequest {
 
     private String email;
-
-    public MailCodeRequest() {
-    }
+    private String password;
+    private String code;
 }
