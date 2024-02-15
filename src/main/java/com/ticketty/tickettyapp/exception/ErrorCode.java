@@ -25,6 +25,8 @@ public enum ErrorCode {
 
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "Internal server error"),
 
+    INVALID_OR_EXPIRED_REFRESH_TOKEN(HttpStatus.BAD_REQUEST, "Invalid or Expired Refresh Token"),
+
 
 
     ;

@@ -16,7 +16,7 @@ public class AuthenticationConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http.csrf().disable()
                 .authorizeRequests()
-                .antMatchers("/api/users/email-codes", "/api/users/signup").permitAll()
+                .antMatchers("/api/users/email-codes", "/api/users/signup", "/api/users/login").permitAll()
                 .antMatchers("/api/**").authenticated()
                 .and()
                 .sessionManagement()
