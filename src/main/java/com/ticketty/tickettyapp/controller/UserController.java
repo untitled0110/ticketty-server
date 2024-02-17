@@ -8,7 +8,6 @@ import com.ticketty.tickettyapp.controller.response.UserSignupResponse;
 import com.ticketty.tickettyapp.model.User;
 import com.ticketty.tickettyapp.service.MailService;
 import com.ticketty.tickettyapp.service.UserService;
-import com.ticketty.tickettyapp.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -22,7 +21,6 @@ public class UserController {
 
     private final MailService mailService;
     private final UserService userService;
-    private final JwtUtil jwtUtil;
 
     @PostMapping("/signup")
     public Response<UserSignupResponse> verifyMailAndSignup(@RequestBody UserSignupRequest request) {
@@ -40,7 +38,5 @@ public class UserController {
         UserLoginResponse userLoginResponse = userService.login(request.getEmail(), request.getPassword());
         return Response.success(userLoginResponse);
     }
-
-
 
 }

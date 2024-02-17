@@ -7,9 +7,9 @@ import com.ticketty.tickettyapp.model.User;
 import com.ticketty.tickettyapp.model.entity.UserEntity;
 import com.ticketty.tickettyapp.repository.UserEntityRepository;
 import com.ticketty.tickettyapp.util.JwtTokenUtils;
+import com.ticketty.tickettyapp.util.PasswordEncoder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,7 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserService {
 
     private final UserEntityRepository userEntityRepository;
-    private final BCryptPasswordEncoder encoder;
+    private final PasswordEncoder passwordEncoder;
 
     @Value("${jwt.secret-key}")
     private String secretKey;
@@ -34,7 +34,7 @@ public class UserService {
         });
 
         // 회원가입 진행 = user를 등록
-        UserEntity userEntity = userEntityRepository.save(UserEntity.of(email, encoder.encode(password)));
+        UserEntity userEntity = userEntityRepository.save(UserEntity.of(email, passwordEncoder.encrypt(email, password)));
         return User.fromEntity(userEntity);
     }
 
@@ -43,7 +43,7 @@ public class UserService {
         UserEntity userEntity = userEntityRepository.findByEmail(email).orElseThrow(() -> new TickettyAppApplicationException(ErrorCode.USER_NOT_FOUND, String.format("%s not founded", email)));
 
         // 비밀번호 체크
-        if (!encoder.matches(password, userEntity.getPassword())) {
+        if (!passwordEncoder.matches(email, password, userEntity.getPassword())) {
             throw new TickettyAppApplicationException(ErrorCode.INVALID_PASSWORD);
         }
 

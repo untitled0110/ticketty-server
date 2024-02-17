@@ -27,8 +27,6 @@ public enum ErrorCode {
 
     INVALID_OR_EXPIRED_REFRESH_TOKEN(HttpStatus.BAD_REQUEST, "Invalid or Expired Refresh Token"),
 
-
-
     ;
 
     private HttpStatus status;
