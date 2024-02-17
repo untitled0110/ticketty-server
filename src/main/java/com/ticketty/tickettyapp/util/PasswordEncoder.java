@@ -27,12 +27,6 @@ public class PasswordEncoder {
         }
     }
 
-    // 저장된 암호화된 비밀번호와 사용자가 제출한 비밀번호를 비교하는 메서드
-    public boolean matches(String email, String password, String encryptedPassword) {
-        String encryptedSubmittedPassword = encrypt(email, password);
-        return encryptedSubmittedPassword.equals(encryptedPassword);
-    }
-
     private byte[] getSalt(String email)
             throws NoSuchAlgorithmException, UnsupportedEncodingException {
 
@@ -40,5 +34,12 @@ public class PasswordEncoder {
         byte[] keyBytes = email.getBytes("UTF-8");
 
         return digest.digest(keyBytes);
+    }
+
+
+    // 저장된 암호화된 비밀번호와 사용자가 제출한 비밀번호를 비교하는 메서드
+    public boolean matches(String email, String password, String encryptedPassword) {
+        String encryptedSubmittedPassword = encrypt(email, password);
+        return encryptedSubmittedPassword.equals(encryptedPassword);
     }
 }

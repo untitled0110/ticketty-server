@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletRequest;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/users")
@@ -37,6 +39,12 @@ public class UserController {
     public Response<UserLoginResponse> login(@RequestBody UserLoginRequest request) {
         UserLoginResponse userLoginResponse = userService.login(request.getEmail(), request.getPassword());
         return Response.success(userLoginResponse);
+    }
+
+    @PostMapping("/auth-test")
+    public String authTest(@RequestBody UserLoginRequest request, HttpServletRequest httpServletRequest) {
+        String email = (String) httpServletRequest.getAttribute("email");
+        return email;
     }
 
 }

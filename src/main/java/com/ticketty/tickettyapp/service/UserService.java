@@ -9,9 +9,10 @@ import com.ticketty.tickettyapp.repository.UserEntityRepository;
 import com.ticketty.tickettyapp.util.JwtTokenUtils;
 import com.ticketty.tickettyapp.util.PasswordEncoder;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Date;
 
 @RequiredArgsConstructor
 @Service
@@ -20,11 +21,7 @@ public class UserService {
     private final UserEntityRepository userEntityRepository;
     private final PasswordEncoder passwordEncoder;
 
-    @Value("${jwt.secret-key}")
-    private String secretKey;
-
-    @Value("${jwt.token.expired-time-ms}")
-    private Long expiredTimeMs;
+    private final JwtTokenUtils jwtTokenUtils;
 
     @Transactional
     public User signUpUser(String email, String password) {
@@ -48,13 +45,15 @@ public class UserService {
         }
 
         // 토큰 생성
-        String accessToken = JwtTokenUtils.generateAccessToken(email, secretKey, expiredTimeMs);
-        String refreshToken = JwtTokenUtils.generateRefreshToken(secretKey, expiredTimeMs);
+        String accessToken = jwtTokenUtils.generateAccessToken(email);
+        String refreshToken = jwtTokenUtils.generateRefreshToken();
 
-        // 액세스 토큰의 만료 시간 계산 (현재 시간 + 만료 시간)
-        long accessTokenExpiration = System.currentTimeMillis() + expiredTimeMs;
+        Date expiration = jwtTokenUtils.extractExpiration(accessToken);
+        System.out.println("expiration!!!!!"+ expiration);
+
+        // 액세스 토큰의 만료 시간을 밀리초 단위로 계산
+        long accessTokenExpiration = expiration.getTime();
 
         return new UserLoginResponse(accessToken, refreshToken, accessTokenExpiration);
     }
-
 }
