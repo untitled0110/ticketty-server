@@ -51,22 +51,6 @@ public class JwtTokenUtils {
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
-//    public boolean validateToken(String token) {
-//        try {
-//            // 토큰 파싱
-//            parseToken(token);
-//            return true;
-//        } catch (ExpiredJwtException e) {
-//            // 유효 시간이 지난 경우
-//            System.err.println("Token has expired: "+ e.getMessage());
-//            return false;
-//        } catch (JwtException e) {
-//            // 토큰 파싱에 실패한 경우
-//            System.err.println("Error parsing token: " + e.getMessage());
-//            return false;
-//        }
-//    }
-
     public boolean validateToken(String token) {
         try {
             // 토큰 파싱

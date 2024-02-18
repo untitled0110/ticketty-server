@@ -35,7 +35,8 @@ public enum ErrorCode {
     INVALID_ACCESS_TOKEN(HttpStatus.BAD_REQUEST, "Invalid Access token"),
 
     EXPIRED_REFRESH_TOKEN(HttpStatus.BAD_REQUEST, "Expired Refresh token"),
-    INVALID_REFRESH_TOKEN(HttpStatus.BAD_REQUEST, "Refresh token contained in the header and refresh token stored in Redis do not match"),
+    INVALID_REFRESH_TOKEN(HttpStatus.BAD_REQUEST, "Invalid Refresh token"),
+//    INVALID_REFRESH_TOKEN(HttpStatus.BAD_REQUEST, "Refresh token contained in the header and refresh token stored in Redis do not match"),
     ;
 
     private HttpStatus status;

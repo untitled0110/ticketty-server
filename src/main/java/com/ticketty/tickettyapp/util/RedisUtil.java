@@ -23,19 +23,19 @@ public class RedisUtil {
         redisTemplate.expire(emailTokenKey, expirationTimeMs, TimeUnit.MILLISECONDS);
     }
 
-    // JWT 리프레시 토큰 저장
+    // refresh token 저장
     public void saveJwtToken(String email, String refreshToken, long expirationTimeMs) {
         String jwtTokenKey = JWT_TOKEN_PREFIX + email;
         redisTemplate.opsForValue().set(jwtTokenKey, refreshToken);
         redisTemplate.expire(jwtTokenKey, expirationTimeMs, TimeUnit.MILLISECONDS);
     }
 
-    // 이메일과 인증 코드 가져오기
+    // 이메일 인증 코드 가져오기
     public String getEmailToken(String email) {
         return redisTemplate.opsForValue().get(EMAIL_TOKEN_PREFIX + email);
     }
 
-    // JWT 리프레시 토큰 가져오기
+    // refresh token 가져오기
     public String getJwtToken(String email) {
         return redisTemplate.opsForValue().get(JWT_TOKEN_PREFIX + email);
     }
@@ -45,7 +45,7 @@ public class RedisUtil {
         redisTemplate.delete(EMAIL_TOKEN_PREFIX + email);
     }
 
-    // JWT 리프레시 토큰 삭제
+    // refresh token 삭제
     public void deleteJwtToken(String email) {
         redisTemplate.delete(JWT_TOKEN_PREFIX + email);
     }

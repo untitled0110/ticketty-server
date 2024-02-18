@@ -23,7 +23,7 @@ public class JwtInterceptor implements HandlerInterceptor {
             return true;
         }
 
-        // 헤더가 있는지 확인
+        // 헤더에 access token이 있는지 확인
         String accessToken = jwtTokenUtils.extractAccessToken(request);
         if (accessToken == null) {
             throw new TickettyAppApplicationException(ErrorCode.MISSING_ACCESS_TOKEN);

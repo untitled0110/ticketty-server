@@ -24,7 +24,6 @@ public class MailService {
     private final UserEntityRepository userEntityRepository;
     private final EmailValidator emailValidator;
     private final PasswordValidator passwordValidator;
-//    private final RedisUtil redisUtil;
     private final RedisUtil redisUtil;
     private final JavaMailSender javaMailSender;
 
@@ -81,7 +80,6 @@ public class MailService {
             throw new TickettyAppApplicationException(ErrorCode.PASSWORD_VALIDATION, String.format("%s, Password validation failed", password));
         }
 
-//        String CodeStoredInRedis = redisUtil.getData(email);
         String codeStoredInRedis = redisUtil.getEmailToken(email);
 
         // 코드가 만료된 경우

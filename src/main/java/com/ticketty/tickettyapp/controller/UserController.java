@@ -24,7 +24,6 @@ public class UserController {
 
     private final MailService mailService;
     private final UserService userService;
-    private final JwtTokenUtils jwtTokenUtils;
 
     @PostMapping("/signup")
     public Response<UserSignupResponse> verifyMailAndSignup(@RequestBody UserSignupRequest request) {

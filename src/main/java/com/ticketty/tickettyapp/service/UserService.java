@@ -55,20 +55,22 @@ public class UserService {
         String refreshToken = jwtTokenUtils.generateRefreshToken();
 
         Date expiration = jwtTokenUtils.extractExpiration(accessToken);
-        System.out.println("AccessToken expiration!!!!!"+ expiration);
+//        System.out.println("AccessToken expiration!!!!!"+ expiration);
 
         long accessTokenExpiration = expiration.getTime();
 
-        // Redis에 JWT 리프레시 토큰 저장
+        // Redis에 refresh token 저장
         redisUtil.saveJwtToken(email, refreshToken, refreshTokenExpiredTimeMs);
 
         return new UserLoginResponse(accessToken, refreshToken, accessTokenExpiration);
     }
 
     public UserLoginResponse reissueAccessToken(HttpServletRequest httpServletRequest) {
+        // 헤더에서 토큰 추출
         String accessTokenInHeader = jwtTokenUtils.extractAccessToken(httpServletRequest);
         String refreshTokenInHeader = jwtTokenUtils.extractRefreshToken(httpServletRequest);
 
+        // 헤더에 토큰이 없는 경우
         if (accessTokenInHeader == null) {
             throw new TickettyAppApplicationException(ErrorCode.MISSING_ACCESS_TOKEN);
         }
@@ -76,28 +78,25 @@ public class UserService {
             throw new TickettyAppApplicationException(ErrorCode.MISSING_REFRESH_TOKEN);
         }
 
-//        System.out.println("헤더에 있던 accessToken!!! "+ accessTokenInHeader);
-//        System.out.println("헤더에 있던 refreshToken!!! "+ refreshTokenInHeader);
-
-        String email = jwtTokenUtils.extractEmailFromExpiredAccessToken(accessTokenInHeader);
-//        System.out.println("액세스 토큰에 있던 email!!! "+ email);
-
+        // refresh token 토큰 유효성 검증
         jwtTokenUtils.validateRefreshToken(refreshTokenInHeader);
 
-        // RefreshToken이 Redis에 있는지 확인
-        String refreshTokenStoredInRedis = redisUtil.getJwtToken(email);
-//        System.out.println("레디스에 있던 refreshToken!!! "+ refreshTokenStoredInRedis);
+        String email = jwtTokenUtils.extractEmailFromExpiredAccessToken(accessTokenInHeader);
+        // email로 회원가입 여부 체크
+        userEntityRepository.findByEmail(email).orElseThrow(() -> new TickettyAppApplicationException(ErrorCode.USER_NOT_FOUND, String.format("%s not founded", email)));
 
+        // refresh token이 Redis에 있는지 확인 후 헤더의 refresh token과 비교
+        String refreshTokenStoredInRedis = redisUtil.getJwtToken(email);
         if (!refreshTokenInHeader.equals(refreshTokenStoredInRedis)) {
             throw new TickettyAppApplicationException(ErrorCode.INVALID_REFRESH_TOKEN);
         }
 
-        // 새로운 AccessToken 발급
+        // 새로운 access token 발급
         String newAccessToken = jwtTokenUtils.generateAccessToken(email);
         Date expiration = jwtTokenUtils.extractExpiration(newAccessToken);
         long accessTokenExpiration = expiration.getTime();
 
-        // 기존 RefreshToken 삭제 후 새로운 RefreshToken 저장
+        // 기존 refresh token 삭제 후 새로운 refresh token 저장
         redisUtil.deleteJwtToken(email);
         String newRefreshToken = jwtTokenUtils.generateRefreshToken();
         redisUtil.saveJwtToken(email, newRefreshToken, refreshTokenExpiredTimeMs);
