@@ -1,13 +1,13 @@
 package com.ticketty.tickettyapp.util;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jws;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import com.ticketty.tickettyapp.exception.TickettyAppApplicationException;
+import com.ticketty.tickettyapp.exception.ErrorCode;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import javax.servlet.http.HttpServletRequest;
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.Date;
@@ -38,6 +38,7 @@ public class JwtTokenUtils {
     }
 
     public String generateRefreshToken() {
+
         return Jwts.builder()
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + refreshTokenExpiredTimeMs))
@@ -50,13 +51,51 @@ public class JwtTokenUtils {
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
+//    public boolean validateToken(String token) {
+//        try {
+//            // 토큰 파싱
+//            parseToken(token);
+//            return true;
+//        } catch (ExpiredJwtException e) {
+//            // 유효 시간이 지난 경우
+//            System.err.println("Token has expired: "+ e.getMessage());
+//            return false;
+//        } catch (JwtException e) {
+//            // 토큰 파싱에 실패한 경우
+//            System.err.println("Error parsing token: " + e.getMessage());
+//            return false;
+//        }
+//    }
+
     public boolean validateToken(String token) {
         try {
+            // 토큰 파싱
             parseToken(token);
             return true;
-        } catch (Exception e) {
+        } catch (ExpiredJwtException e) {
+            // 유효 시간이 지난 경우
+            System.err.println("Token has expired: " + e.getMessage());
+            throw new TickettyAppApplicationException(ErrorCode.EXPIRED_ACCESS_TOKEN, "Expired Access token");
+        } catch (JwtException e) {
+            // 토큰 파싱에 실패한 경우
             System.err.println("Error parsing token: " + e.getMessage());
-            return false;
+            throw new TickettyAppApplicationException(ErrorCode.INVALID_ACCESS_TOKEN, "Error parsing Access token");
+        }
+    }
+
+    public boolean validateRefreshToken(String token) {
+        try {
+            // 토큰 파싱
+            parseToken(token);
+            return true;
+        } catch (ExpiredJwtException e) {
+            // 유효 시간이 지난 경우
+            System.err.println("Token has expired: " + e.getMessage());
+            throw new TickettyAppApplicationException(ErrorCode.EXPIRED_REFRESH_TOKEN, "Expired Refresh token");
+        } catch (JwtException e) {
+            // 토큰 파싱에 실패한 경우
+            System.err.println("Error parsing token: " + e.getMessage());
+            throw new TickettyAppApplicationException(ErrorCode.INVALID_REFRESH_TOKEN, "Error parsing Refresh token");
         }
     }
 
@@ -80,7 +119,42 @@ public class JwtTokenUtils {
                 .getBody();
     }
 
+//    public String getSubject(String token) {
+//        return parseToken(token).getBody().getSubject();
+//    }
+
     public String getSubject(String token) {
-        return parseToken(token).getBody().getSubject();
+        Claims claims = extractAllClaims(token);
+        return claims.getSubject();
     }
+
+    public String extractAccessToken(HttpServletRequest request) {
+        String token = request.getHeader("Authorization");
+        if (token != null && token.startsWith("Bearer ")) {
+            return token.substring(7);
+        }
+        return null;
+    }
+
+    public String extractRefreshToken(HttpServletRequest request) {
+        String token = request.getHeader("Refresh");
+        if (token != null && token.startsWith("Bearer ")) {
+            return token.substring(7);
+        }
+        return null;
+    }
+
+    public String extractEmailFromExpiredAccessToken(String accessToken) {
+        try {
+            Claims claims = parseToken(accessToken).getBody();
+            return claims.getSubject();
+        } catch (ExpiredJwtException e) {
+            // 만료된 토큰인 경우에도 클레임을 추출하여 반환
+            return e.getClaims().getSubject();
+        } catch (JwtException e) {
+            // 토큰 파싱에 실패한 경우 예외 처리
+            throw new TickettyAppApplicationException(ErrorCode.INVALID_ACCESS_TOKEN, "Invalid Access token");
+        }
+    }
+
 }

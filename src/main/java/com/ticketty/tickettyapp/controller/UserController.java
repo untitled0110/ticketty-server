@@ -8,6 +8,7 @@ import com.ticketty.tickettyapp.controller.response.UserSignupResponse;
 import com.ticketty.tickettyapp.model.User;
 import com.ticketty.tickettyapp.service.MailService;
 import com.ticketty.tickettyapp.service.UserService;
+import com.ticketty.tickettyapp.util.JwtTokenUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -23,6 +24,7 @@ public class UserController {
 
     private final MailService mailService;
     private final UserService userService;
+    private final JwtTokenUtils jwtTokenUtils;
 
     @PostMapping("/signup")
     public Response<UserSignupResponse> verifyMailAndSignup(@RequestBody UserSignupRequest request) {
@@ -41,10 +43,15 @@ public class UserController {
         return Response.success(userLoginResponse);
     }
 
+    @PostMapping("/reissue")
+    public Response<UserLoginResponse> reissueAccessToken(HttpServletRequest httpServletRequest) {
+        UserLoginResponse userLoginResponse = userService.reissueAccessToken(httpServletRequest);
+        return Response.success(userLoginResponse);
+    }
+
     @PostMapping("/auth-test")
-    public String authTest(@RequestBody UserLoginRequest request, HttpServletRequest httpServletRequest) {
-        String email = (String) httpServletRequest.getAttribute("email");
-        return email;
+    public String authTest(HttpServletRequest httpServletRequest) {
+        return (String) httpServletRequest.getAttribute("email");
     }
 
 }
