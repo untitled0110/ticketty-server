@@ -18,15 +18,25 @@ public enum ErrorCode {
     PASSWORD_VALIDATION(HttpStatus.OK, "Password validation failed"),
     DUPLICATED_EMAIL(HttpStatus.OK, "Email is duplicated"),
     EXPIRED_CODE(HttpStatus.OK, "Code has expired"),
-    AUTHENTICATION_FAILED(HttpStatus.OK, "Email authentication failed"),
+    EMAIL_AUTHENTICATION_FAILED(HttpStatus.OK, "Email authentication failed"),
 
-    USER_NOT_FOUND(HttpStatus.NOT_FOUND, "User not founded"),
-    INVALID_PASSWORD(HttpStatus.UNAUTHORIZED, "Password is invalid"),
+//    USER_NOT_FOUND(HttpStatus.NOT_FOUND, "User not founded"),
+//    INVALID_PASSWORD(HttpStatus.UNAUTHORIZED, "Password is invalid"),
+
+    USER_NOT_FOUND(HttpStatus.OK, "User not founded"),
+    INVALID_PASSWORD(HttpStatus.OK, "Password is invalid"),
 
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "Internal server error"),
 
+    MISSING_ACCESS_TOKEN(HttpStatus.BAD_REQUEST, "No Access token in header"),
+    MISSING_REFRESH_TOKEN(HttpStatus.BAD_REQUEST, "No Refresh token in header"),
 
+    EXPIRED_ACCESS_TOKEN(HttpStatus.BAD_REQUEST, "Expired Access token"),
+    INVALID_ACCESS_TOKEN(HttpStatus.BAD_REQUEST, "Invalid Access token"),
 
+    EXPIRED_REFRESH_TOKEN(HttpStatus.BAD_REQUEST, "Expired Refresh token"),
+    INVALID_REFRESH_TOKEN(HttpStatus.BAD_REQUEST, "Invalid Refresh token"),
+//    INVALID_REFRESH_TOKEN(HttpStatus.BAD_REQUEST, "Refresh token contained in the header and refresh token stored in Redis do not match"),
     ;
 
     private HttpStatus status;

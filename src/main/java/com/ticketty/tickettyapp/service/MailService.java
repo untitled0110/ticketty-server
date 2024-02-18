@@ -14,9 +14,12 @@ import org.springframework.stereotype.Service;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 
-@Service
 @RequiredArgsConstructor
+@Service
 public class MailService {
+
+    @Value("${mail.code-expired-time-ms}")
+    private Long emailCodeExpiredTimeMs;
 
     private final UserEntityRepository userEntityRepository;
     private final EmailValidator emailValidator;
@@ -39,16 +42,16 @@ public class MailService {
             throw new TickettyAppApplicationException(ErrorCode.DUPLICATED_EMAIL, String.format("%s is duplicated", email));
         });
 
-        String code = generateRandomNumber();
+        String emailAuthenticationCode = generateRandomNumber();
 
-        MimeMessage message = createMail(email, code);
+        MimeMessage message = createMail(email, emailAuthenticationCode);
         javaMailSender.send(message);
 
-        // Redis에 데이터 저장
-        redisUtil.setDataExpire(email, code, 60);
-        System.out.println("code: "+ code);
+        // Redis에 이메일 인증 코드 저장
+        redisUtil.saveEmailToken(email, emailAuthenticationCode, emailCodeExpiredTimeMs);
+        System.out.println("emailVerificationCode: "+ emailAuthenticationCode);
 
-        return code;
+        return emailAuthenticationCode;
     }
 
     private String generateRandomNumber() {
@@ -77,17 +80,17 @@ public class MailService {
             throw new TickettyAppApplicationException(ErrorCode.PASSWORD_VALIDATION, String.format("%s, Password validation failed", password));
         }
 
-        String CodeStoredInRedis = redisUtil.getData(email);
+        String codeStoredInRedis = redisUtil.getEmailToken(email);
 
         // 코드가 만료된 경우
-        if (CodeStoredInRedis == null) {
+        if (codeStoredInRedis == null) {
             throw new TickettyAppApplicationException(ErrorCode.EXPIRED_CODE, String.format("%s, Expired code", email));
         }
 
         // 코드 인증 실패 (입력한 코드와 메일로 발송된 코드가 다른 경우)
-        boolean isEqual = CodeStoredInRedis.equalsIgnoreCase(code);
+        boolean isEqual = codeStoredInRedis.equalsIgnoreCase(code);
         if (!isEqual) {
-            throw new TickettyAppApplicationException(ErrorCode.AUTHENTICATION_FAILED, String.format("%s, Email authentication failed", email));
+            throw new TickettyAppApplicationException(ErrorCode.EMAIL_AUTHENTICATION_FAILED, String.format("%s, Email authentication failed", email));
         }
 
         // 이메일 인증 성공

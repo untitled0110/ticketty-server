@@ -1,7 +1,6 @@
 package com.ticketty.tickettyapp.controller;
 
 import com.ticketty.tickettyapp.controller.request.MailCodeRequest;
-import com.ticketty.tickettyapp.controller.request.UserSignupRequest;
 import com.ticketty.tickettyapp.controller.response.MailCodeResponse;
 import com.ticketty.tickettyapp.controller.response.Response;
 import com.ticketty.tickettyapp.service.MailService;
@@ -16,7 +15,7 @@ public class MailController {
     private final MailService mailService;
     @PostMapping("/email-codes")
     public Response<MailCodeResponse> sendMail(@RequestBody MailCodeRequest request) {
-        String code = mailService.sendMail(request.getEmail());
-        return Response.success(new MailCodeResponse(code));
+        String emailAuthenticationCode = mailService.sendMail(request.getEmail());
+        return Response.success(new MailCodeResponse(emailAuthenticationCode));
     }
 }
