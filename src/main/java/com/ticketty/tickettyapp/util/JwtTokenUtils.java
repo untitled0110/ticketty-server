@@ -4,6 +4,7 @@ import com.ticketty.tickettyapp.exception.TickettyAppApplicationException;
 import com.ticketty.tickettyapp.exception.ErrorCode;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -12,6 +13,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.Date;
 
+@RequiredArgsConstructor
 @Component
 public class JwtTokenUtils {
 
@@ -23,6 +25,8 @@ public class JwtTokenUtils {
 
     @Value("${jwt.token.expired-time-ms.refresh}")
     private Long refreshTokenExpiredTimeMs;
+
+    private final RedisUtil redisUtil;
 
     public String generateAccessToken(String email) {
         Claims claims = Jwts.claims();
@@ -51,11 +55,11 @@ public class JwtTokenUtils {
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
-    public boolean validateToken(String token) {
+    public void validateAccessToken(String token) {
         try {
             // 토큰 파싱
             parseToken(token);
-            return true;
+//            return true;
         } catch (ExpiredJwtException e) {
             // 유효 시간이 지난 경우
             System.err.println("Token has expired: " + e.getMessage());
@@ -67,15 +71,31 @@ public class JwtTokenUtils {
         }
     }
 
-    public boolean validateRefreshToken(String token) {
+    public void validateRefreshToken(String token) {
         try {
             // 토큰 파싱
             parseToken(token);
-            return true;
+//            return true;
         } catch (ExpiredJwtException e) {
             // 유효 시간이 지난 경우
             System.err.println("Token has expired: " + e.getMessage());
             throw new TickettyAppApplicationException(ErrorCode.EXPIRED_REFRESH_TOKEN, "Expired Refresh token");
+        } catch (JwtException e) {
+            // 토큰 파싱에 실패한 경우
+            System.err.println("Error parsing token: " + e.getMessage());
+            throw new TickettyAppApplicationException(ErrorCode.INVALID_REFRESH_TOKEN, "Error parsing Refresh token");
+        }
+    }
+
+    public boolean validateRefreshTokenForLogOut(String token) {
+        try {
+            // 토큰 파싱
+            parseToken(token);
+            return true; // 유효한 토큰인 경우 true 반환
+        } catch (ExpiredJwtException e) {
+            // 유효 시간이 지난 경우
+            System.err.println("Token has expired: " + e.getMessage());
+            return false; // 유효 시간이 지난 경우 false 반환
         } catch (JwtException e) {
             // 토큰 파싱에 실패한 경우
             System.err.println("Error parsing token: " + e.getMessage());
@@ -137,7 +157,14 @@ public class JwtTokenUtils {
             return e.getClaims().getSubject();
         } catch (JwtException e) {
             // 토큰 파싱에 실패한 경우 예외 처리
-            throw new TickettyAppApplicationException(ErrorCode.INVALID_ACCESS_TOKEN, "Invalid Access token");
+            throw new TickettyAppApplicationException(ErrorCode.INVALID_ACCESS_TOKEN, "Error parsing Access token");
+        }
+    }
+
+    public void isAccessTokenLoggedOut(String accessTokenInHeader) {
+
+        if(redisUtil.isAccessTokenBlacklisted(accessTokenInHeader)){
+            throw new TickettyAppApplicationException(ErrorCode.ALREADY_LOGGED_OUT_ACCESS_TOKEN);
         }
     }
 

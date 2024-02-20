@@ -8,7 +8,6 @@ import com.ticketty.tickettyapp.controller.response.UserSignupResponse;
 import com.ticketty.tickettyapp.model.User;
 import com.ticketty.tickettyapp.service.MailService;
 import com.ticketty.tickettyapp.service.UserService;
-import com.ticketty.tickettyapp.util.JwtTokenUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -51,6 +50,12 @@ public class UserController {
     @PostMapping("/auth-test")
     public String authTest(HttpServletRequest httpServletRequest) {
         return (String) httpServletRequest.getAttribute("email");
+    }
+
+    @PostMapping("/logout")
+    public Response<Void> logout(HttpServletRequest httpServletRequest) {
+        userService.logout(httpServletRequest);
+        return Response.success(null);
     }
 
 }

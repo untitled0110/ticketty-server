@@ -10,7 +10,8 @@ import java.util.concurrent.TimeUnit;
 public class RedisUtil {
 
     private static final String EMAIL_TOKEN_PREFIX = "emailVerificationCode:";
-    private static final String JWT_TOKEN_PREFIX = "jwtRefreshToken:";
+    private static final String REFRESH_TOKEN_PREFIX = "jwtRefreshToken:";
+    private static final String BLACKLISTED_ACCESS_TOKEN_PREFIX = "blacklistedAccessToken:";
 
     @Autowired
     private StringRedisTemplate redisTemplate;
@@ -25,7 +26,7 @@ public class RedisUtil {
 
     // refresh token 저장
     public void saveJwtToken(String email, String refreshToken, long expirationTimeMs) {
-        String jwtTokenKey = JWT_TOKEN_PREFIX + email;
+        String jwtTokenKey = REFRESH_TOKEN_PREFIX + email;
         redisTemplate.opsForValue().set(jwtTokenKey, refreshToken);
         redisTemplate.expire(jwtTokenKey, expirationTimeMs, TimeUnit.MILLISECONDS);
     }
@@ -37,7 +38,7 @@ public class RedisUtil {
 
     // refresh token 가져오기
     public String getJwtToken(String email) {
-        return redisTemplate.opsForValue().get(JWT_TOKEN_PREFIX + email);
+        return redisTemplate.opsForValue().get(REFRESH_TOKEN_PREFIX + email);
     }
 
     // 이메일 인증 코드 삭제
@@ -46,8 +47,23 @@ public class RedisUtil {
     }
 
     // refresh token 삭제
-    public void deleteJwtToken(String email) {
-        redisTemplate.delete(JWT_TOKEN_PREFIX + email);
+    public void deleteRefreshTokenInRedis(String email) {
+        redisTemplate.delete(REFRESH_TOKEN_PREFIX + email);
     }
+
+
+    // access token 블랙리스트로 저장
+    public void saveBlacklistedAccessToken(String accessToken) {
+//        String blacklistedTokenKey = BLACKLISTED_ACCESS_TOKEN_PREFIX + accessToken;
+        String blacklistedTokenKey = BLACKLISTED_ACCESS_TOKEN_PREFIX + accessToken;
+        redisTemplate.opsForValue().set(blacklistedTokenKey, "BLACKLISTED");
+    }
+
+    // access token이 블랙리스트에 저장되어있는지 여부 확인
+    public boolean isAccessTokenBlacklisted(String accessToken) {
+        String blacklistedTokenKey = BLACKLISTED_ACCESS_TOKEN_PREFIX + accessToken;
+        return Boolean.TRUE.equals(redisTemplate.hasKey(blacklistedTokenKey));
+    }
+
 
 }
