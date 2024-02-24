@@ -17,6 +17,8 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
 
+import static com.ticketty.tickettyapp.exception.ErrorCode.USER_NOT_FOUND;
+
 @RequiredArgsConstructor
 @Service
 public class UserService {
@@ -31,11 +33,6 @@ public class UserService {
 
     @Transactional
     public User signUpUser(String email, String password) {
-        // 이미 가입된 email일 경우
-        userEntityRepository.findByEmail(email).ifPresent(it -> {
-            throw new TickettyAppApplicationException(ErrorCode.DUPLICATED_EMAIL, String.format("%s is duplicated", email));
-        });
-
         // 회원가입 진행 = user를 등록
         UserEntity userEntity = userEntityRepository.save(UserEntity.of(email, passwordEncoder.encrypt(email, password)));
         return User.fromEntity(userEntity);
@@ -43,7 +40,7 @@ public class UserService {
 
     public UserLoginResponse login(String email, String password) {
         // 회원가입 여부 체크
-        UserEntity userEntity = userEntityRepository.findByEmail(email).orElseThrow(() -> new TickettyAppApplicationException(ErrorCode.USER_NOT_FOUND, String.format("%s not founded", email)));
+        UserEntity userEntity = userEntityRepository.findByEmail(email).orElseThrow(() -> new TickettyAppApplicationException(USER_NOT_FOUND, String.format("%s not founded", email)));
 
         // 비밀번호 체크
         if (!passwordEncoder.matches(email, password, userEntity.getPassword())) {
@@ -55,7 +52,6 @@ public class UserService {
         String refreshToken = jwtTokenUtils.generateRefreshToken();
 
         Date expiration = jwtTokenUtils.extractExpiration(accessToken);
-//        System.out.println("AccessToken expiration!!!!!"+ expiration);
 
         long accessTokenExpiration = expiration.getTime();
 
@@ -82,7 +78,7 @@ public class UserService {
         // access token 으로 이메일 추출 (+ access token 이 파싱 되는지 확인)
         String emailFromAccessToken = jwtTokenUtils.extractEmailFromExpiredAccessToken(accessTokenInHeader);
         // email로 회원가입 여부 체크
-        userEntityRepository.findByEmail(emailFromAccessToken).orElseThrow(() -> new TickettyAppApplicationException(ErrorCode.USER_NOT_FOUND, String.format("%s not founded", emailFromAccessToken)));
+        userEntityRepository.findByEmail(emailFromAccessToken).orElseThrow(() -> new TickettyAppApplicationException(USER_NOT_FOUND, String.format("%s not founded", emailFromAccessToken)));
 
         // refresh token이 Redis에 있는지 확인 후 헤더의 refresh token과 비교
         compareRefreshTokens(refreshTokenInHeader, emailFromAccessToken);
@@ -116,7 +112,7 @@ public class UserService {
         // access token 으로 이메일 추출 (+ access token 이 파싱 되는지 확인)
         String emailFromAccessToken = jwtTokenUtils.extractEmailFromExpiredAccessToken(accessTokenInHeader);
         // email로 회원가입 여부 체크
-        userEntityRepository.findByEmail(emailFromAccessToken).orElseThrow(() -> new TickettyAppApplicationException(ErrorCode.USER_NOT_FOUND, String.format("%s not founded", emailFromAccessToken)));
+        userEntityRepository.findByEmail(emailFromAccessToken).orElseThrow(() -> new TickettyAppApplicationException(USER_NOT_FOUND, String.format("%s not founded", emailFromAccessToken)));
 
         // access token 을 Redis에 블랙리스트로 저장한다.
         redisUtil.saveBlacklistedAccessToken(accessTokenInHeader);
@@ -150,4 +146,14 @@ public class UserService {
         }
     }
 
+    @Transactional
+    public void changePassword(String email, String password) {
+        UserEntity userEntity = userEntityRepository.findByEmail(email)
+                .orElseThrow(() -> new TickettyAppApplicationException(USER_NOT_FOUND, String.format("%s not founded", email)));
+        userEntity.setPassword(passwordEncoder.encrypt(email, password));
+        userEntityRepository.save(userEntity);
+    }
+
 }
+
+

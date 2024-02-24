@@ -13,9 +13,11 @@ import org.springframework.web.bind.annotation.*;
 public class MailController {
 
     private final MailService mailService;
+
     @PostMapping("/email-codes")
-    public Response<MailCodeResponse> sendMail(@RequestBody MailCodeRequest request) {
-        String emailAuthenticationCode = mailService.sendMail(request.getEmail());
+    public Response<MailCodeResponse> sendMail(@RequestBody MailCodeRequest request, @RequestParam String action) {
+
+        String emailAuthenticationCode = mailService.sendMail(request.getEmail(), action);
         return Response.success(new MailCodeResponse(emailAuthenticationCode));
     }
 }
