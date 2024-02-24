@@ -14,6 +14,11 @@ import org.springframework.stereotype.Service;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static com.ticketty.tickettyapp.exception.ErrorCode.USER_NOT_FOUND;
+
 @RequiredArgsConstructor
 @Service
 public class MailService {
@@ -30,17 +35,24 @@ public class MailService {
     @Value("${mail.sender-email}")
     private String senderEmail;
 
-    public String sendMail(String email) {
+    public String sendMail(String email, String action) {
 
         // 이메일 validation
         if (!emailValidator.test(email)) {
             throw new TickettyAppApplicationException(ErrorCode.EMAIL_VALIDATION, String.format("%s, Email validation failed", email));
         }
 
-        // 이미 가입된 email일 경우
-        userEntityRepository.findByEmail(email).ifPresent(it -> {
-            throw new TickettyAppApplicationException(ErrorCode.DUPLICATED_EMAIL, String.format("%s is duplicated", email));
-        });
+        // 이미 가입된 email 일 때 (회원 가입 요청일 때만 확인)
+        if ("signup".equals(action)) {
+            userEntityRepository.findByEmail(email).ifPresent(it -> {
+                throw new TickettyAppApplicationException(ErrorCode.DUPLICATED_EMAIL, String.format("%s is duplicated", email));
+            });
+        }
+
+        // 가입되지 않은 email 일 때 (비번 찾기 요청일 때만 확인)
+        if ("password".equals(action)) {
+            userEntityRepository.findByEmail(email).orElseThrow(() -> new TickettyAppApplicationException(USER_NOT_FOUND, String.format("%s not founded", email)));
+        }
 
         String emailAuthenticationCode = generateRandomNumber();
 
@@ -64,9 +76,11 @@ public class MailService {
             message.setFrom(senderEmail);
             message.setRecipients(MimeMessage.RecipientType.TO, email);
             message.setSubject("이메일 인증");
-            String body = "<h3>요청하신 인증 번호입니다.</h3>"
-                    + "<h1>" + code + "</h1>"
-                    + "<h3>감사합니다.</h3>";
+            String body = String.join("",
+                    "<h3>요청하신 인증 번호입니다.</h3>",
+                    "<h1>" + code + "</h1>",
+                    "<h3>감사합니다.</h3>"
+            );
             message.setText(body, "UTF-8", "html");
         } catch (MessagingException e) {
             throw new RuntimeException("Failed to create mail message.", e);
@@ -74,10 +88,22 @@ public class MailService {
         return message;
     }
 
-    public boolean verifyMail(String email, String password, String code) {
+    public void verifyMail(String email, String password, String code, String action) {
         // 비밀번호 validation 실패
         if (!passwordValidator.test(password)) {
             throw new TickettyAppApplicationException(ErrorCode.PASSWORD_VALIDATION, String.format("%s, Password validation failed", password));
+        }
+
+        // 가입되지 않은 email 일 때 (비번 찾기 요청일 때만 확인)
+        if ("password".equals(action)) {
+            userEntityRepository.findByEmail(email).orElseThrow(() -> new TickettyAppApplicationException(USER_NOT_FOUND, String.format("%s not founded", email)));
+        }
+
+        // 이미 가입된 email 일 때 (회원 가입 요청일 때만 확인)
+        if ("signup".equals(action)) {
+            userEntityRepository.findByEmail(email).ifPresent(it -> {
+                throw new TickettyAppApplicationException(ErrorCode.DUPLICATED_EMAIL, String.format("%s is duplicated", email));
+            });
         }
 
         String codeStoredInRedis = redisUtil.getEmailToken(email);
@@ -92,10 +118,6 @@ public class MailService {
         if (!isEqual) {
             throw new TickettyAppApplicationException(ErrorCode.EMAIL_AUTHENTICATION_FAILED, String.format("%s, Email authentication failed", email));
         }
-
-        // 이메일 인증 성공
-        return true;
     }
-
 
 }

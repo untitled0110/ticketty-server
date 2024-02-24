@@ -9,10 +9,7 @@ import com.ticketty.tickettyapp.model.User;
 import com.ticketty.tickettyapp.service.MailService;
 import com.ticketty.tickettyapp.service.UserService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -28,7 +25,7 @@ public class UserController {
     public Response<UserSignupResponse> verifyMailAndSignup(@RequestBody UserSignupRequest request) {
 
         // 이메일 인증
-        mailService.verifyMail(request.getEmail(), request.getPassword(), request.getCode());
+        mailService.verifyMail(request.getEmail(), request.getPassword(), request.getCode(), "signup");
 
         // 이메일 인증 성공 시 -> 회원가입
         User user = userService.signUpUser(request.getEmail(), request.getPassword());
@@ -55,6 +52,17 @@ public class UserController {
     @PostMapping("/logout")
     public Response<Void> logout(HttpServletRequest httpServletRequest) {
         userService.logout(httpServletRequest);
+        return Response.success(null);
+    }
+
+    @PutMapping("/password")
+    public Response<Void> changePassword(@RequestBody UserSignupRequest request) {
+
+        // 이메일 인증
+        mailService.verifyMail(request.getEmail(), request.getPassword(), request.getCode(), "password");
+
+        // 이메일 인증 성공 시 -> 패스워드 변경
+        userService.changePassword(request.getEmail(), request.getPassword());
         return Response.success(null);
     }
 
