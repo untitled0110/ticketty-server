@@ -14,11 +14,6 @@ import org.springframework.stereotype.Service;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import static com.ticketty.tickettyapp.exception.ErrorCode.USER_NOT_FOUND;
-
 @RequiredArgsConstructor
 @Service
 public class MailService {
@@ -51,7 +46,7 @@ public class MailService {
 
         // 가입되지 않은 email 일 때 (비번 찾기 요청일 때만 확인)
         if ("password".equals(action)) {
-            userEntityRepository.findByEmail(email).orElseThrow(() -> new TickettyAppApplicationException(USER_NOT_FOUND, String.format("%s not founded", email)));
+            userEntityRepository.findByEmail(email).orElseThrow(() -> new TickettyAppApplicationException(ErrorCode.USER_NOT_FOUND, String.format("%s not founded", email)));
         }
 
         String emailAuthenticationCode = generateRandomNumber();
@@ -96,7 +91,7 @@ public class MailService {
 
         // 가입되지 않은 email 일 때 (비번 찾기 요청일 때만 확인)
         if ("password".equals(action)) {
-            userEntityRepository.findByEmail(email).orElseThrow(() -> new TickettyAppApplicationException(USER_NOT_FOUND, String.format("%s not founded", email)));
+            userEntityRepository.findByEmail(email).orElseThrow(() -> new TickettyAppApplicationException(ErrorCode.USER_NOT_FOUND, String.format("%s not founded", email)));
         }
 
         // 이미 가입된 email 일 때 (회원 가입 요청일 때만 확인)
