@@ -28,13 +28,15 @@ public class JwtTokenUtils {
 
     private final RedisUtil redisUtil;
 
-    public String generateAccessToken(String email) {
+    public String generateAccessToken(String email, Integer userId) {
         Claims claims = Jwts.claims();
         claims.put("email", email);
+        claims.put("id", userId);
 
         return Jwts.builder()
                 .setClaims(claims)
-                .setSubject(String.valueOf(email))
+//                .setSubject(String.valueOf(email))
+                .setSubject(String.valueOf(userId))
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + accessTokenExpiredTimeMs))
                 .signWith(getKey(), SignatureAlgorithm.HS256)
