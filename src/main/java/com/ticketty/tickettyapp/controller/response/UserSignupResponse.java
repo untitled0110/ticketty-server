@@ -13,6 +13,7 @@ public class UserSignupResponse {
     private String email;
     private UserRole role;
 
+    // User 객체를 UserSignupResponse 객체로 변환
     public static UserSignupResponse fromUser(User user) {
         return new UserSignupResponse(
                 user.getId(),

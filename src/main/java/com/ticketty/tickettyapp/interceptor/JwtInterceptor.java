@@ -29,15 +29,15 @@ public class JwtInterceptor implements HandlerInterceptor {
             throw new TickettyAppApplicationException(ErrorCode.MISSING_ACCESS_TOKEN);
         }
 
-         // 이미 로그아웃된 액세스 토큰인지 확인 (= blacklist 에 있는지)
+        // 이미 로그아웃된 액세스 토큰인지 확인 (= blacklist 에 있는지)
         jwtTokenUtils.isAccessTokenLoggedOut(accessTokenInHeader);
 
         // 토큰의 유효성을 확인
         jwtTokenUtils.validateAccessToken(accessTokenInHeader);
 
         // 토큰이 유효하면 request에 이메일을 추가
-        String email = jwtTokenUtils.getSubject(accessTokenInHeader);
-        request.setAttribute("email", email);
+        String userId = jwtTokenUtils.getSubject(accessTokenInHeader);
+        request.setAttribute("userId", userId);
 
         return true;
     }
