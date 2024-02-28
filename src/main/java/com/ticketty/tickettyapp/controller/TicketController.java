@@ -20,10 +20,7 @@ public class TicketController {
     @PostMapping
     public Response<IssueTicketResponse> issueTicket(HttpServletRequest httpServletRequest) {
 
-//        String userIdString = (String) httpServletRequest.getAttribute("userId");
-//        Integer userId = Integer.valueOf(userIdString);
-
-        Integer userId = Integer.parseInt(httpServletRequest.getAttribute("userId").toString());
+        Integer userId = (Integer) httpServletRequest.getAttribute("userId");
         IssueTicketResponse issueTicketResponse = ticketService.createTicket(userId);
 
         return Response.success(issueTicketResponse);

@@ -56,7 +56,7 @@ public class MailService {
 
         // Redis에 이메일 인증 코드 저장
         redisUtil.saveEmailToken(email, emailAuthenticationCode, emailCodeExpiredTimeMs);
-        System.out.println("emailVerificationCode: "+ emailAuthenticationCode);
+//        System.out.println("emailVerificationCode: "+ emailAuthenticationCode);
 
         return emailAuthenticationCode;
     }

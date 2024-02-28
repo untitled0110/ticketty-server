@@ -36,7 +36,7 @@ public class JwtInterceptor implements HandlerInterceptor {
         jwtTokenUtils.validateAccessToken(accessTokenInHeader);
 
         // 토큰이 유효하면 request에 이메일을 추가
-        String userId = jwtTokenUtils.getSubject(accessTokenInHeader);
+        Integer userId = jwtTokenUtils.getUserId(accessTokenInHeader);
         request.setAttribute("userId", userId);
 
         return true;

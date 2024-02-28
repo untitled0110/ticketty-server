@@ -18,7 +18,6 @@ public class RedisUtil {
 
     // 이메일 인증 코드 저장
     public void saveEmailToken(String email, String verificationCode, long expirationTimeMs) {
-        System.out.println("saveEmailToken 호출!!");
         String emailTokenKey = EMAIL_TOKEN_PREFIX + email;
         redisTemplate.opsForValue().set(emailTokenKey, verificationCode);
         redisTemplate.expire(emailTokenKey, expirationTimeMs, TimeUnit.MILLISECONDS);

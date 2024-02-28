@@ -31,12 +31,12 @@ public class JwtTokenUtils {
     public String generateAccessToken(String email, Integer userId) {
         Claims claims = Jwts.claims();
         claims.put("email", email);
-        claims.put("id", userId);
+        claims.put("userId", userId);
 
         return Jwts.builder()
                 .setClaims(claims)
-//                .setSubject(String.valueOf(email))
-                .setSubject(String.valueOf(userId))
+                .setSubject(String.valueOf(email))
+//                .setSubject(String.valueOf(userId))
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + accessTokenExpiredTimeMs))
                 .signWith(getKey(), SignatureAlgorithm.HS256)
@@ -133,6 +133,17 @@ public class JwtTokenUtils {
         Claims claims = extractAllClaims(token);
         return claims.getSubject();
     }
+
+    public String getEmail(String token) {
+        Claims claims = extractAllClaims(token);
+        return (String) claims.get("email");
+    }
+
+    public Integer getUserId(String token) {
+        Claims claims = extractAllClaims(token);
+        return (Integer) claims.get("userId");
+    }
+
 
     public String extractAccessToken(HttpServletRequest request) {
         String token = request.getHeader("Authorization");
