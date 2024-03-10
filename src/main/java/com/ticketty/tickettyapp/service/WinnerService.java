@@ -18,29 +18,6 @@ public class WinnerService {
 
     private final WinnerEntityRepository winnerEntityRepository;
 
-//    public WinnerAndPrizeResponse getTodayWinnerAndPrize() {
-//        // 오늘 날짜의 시작과 끝을 Timestamp 형식으로 변환
-//        Timestamp startOfDay = Timestamp.valueOf(LocalDate.now().atStartOfDay());
-//        Timestamp endOfDay = Timestamp.valueOf(LocalDate.now().plusDays(1).atStartOfDay().minusSeconds(1));
-//
-//        // 오늘의 날짜로 저장된 당첨자 정보를 가져옴
-//        List<WinnerEntity> todayWinners = winnerEntityRepository.findByRegisteredAtBetween(startOfDay, endOfDay);
-//
-//        WinnerAndPrizeResponse response = new WinnerAndPrizeResponse();
-//
-//        if (!todayWinners.isEmpty()) {
-//            WinnerEntity winner = todayWinners.get(0);
-//            response.setWinner_user_id(winner.getUser().getId());
-////            response.setWinner_email(winner.getUser().getEmail());
-//            response.setTicket_id(winner.getTicket().getId());
-//            response.setPrize_money(winner.getPrizeMoney());
-//        } else {
-//            throw new TickettyAppApplicationException(ErrorCode.WINNER_NOT_FOUND);
-//        }
-//
-//        return response;
-//    }
-
     public WinnerAndPrizeResponse getTodayWinnerAndPrize() {
         // 오늘 날짜의 시작과 끝을 Timestamp 형식으로 변환
         Timestamp startOfDay = Timestamp.valueOf(LocalDate.now().atStartOfDay());
@@ -61,13 +38,11 @@ public class WinnerService {
         if (!todayWinners.isEmpty()) {
             WinnerEntity winner = todayWinners.get(0);
             response.setWinner_user_id(winner.getUser().getId());
-//            response.setWinner_email(winner.getUser().getEmail());
             response.setTicket_id(winner.getTicket().getId());
             response.setPrize_money(winner.getPrizeMoney());
         } else {
             throw new TickettyAppApplicationException(ErrorCode.WINNER_NOT_FOUND);
         }
-
         return response;
     }
 }
