@@ -10,20 +10,31 @@ import java.sql.Timestamp;
 import java.time.Instant;
 
 @Entity
-@Table(name = "\"tickets\"")
+@Table(name = "\"winners\"")
 @Getter
 @Setter
-@SQLDelete(sql = "UPDATE \"tickets\" SET deleted_at = NOW() where id=?")
+@SQLDelete(sql = "UPDATE \"winners\" SET deleted_at = NOW() where id=?")
 @Where(clause = "deleted_at is NULL")
-public class TicketEntity {
+public class WinnerEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @ManyToOne(fetch = FetchType.LAZY) // 다대일 관계, Lazy 로딩 설정
-    @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false) // 외래 키 설정
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
     private UserEntity user;
+
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "ticket_id", referencedColumnName = "id", nullable = false, unique = true)
+//    private TicketEntity ticket;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "ticket_id", referencedColumnName = "id", nullable = false, unique = true)
+    private TicketEntity ticket;
+
+    @Column(name = "prize_money", nullable = false)
+    private Integer prizeMoney;
 
     @Column(name = "registered_at")
     private Timestamp registeredAt;
@@ -44,13 +55,5 @@ public class TicketEntity {
         this.updatedAt = Timestamp.from(Instant.now());
     }
 
-    @OneToOne(mappedBy = "ticket", fetch = FetchType.LAZY)
-    private WinnerEntity winner;
-
-    public static TicketEntity of(UserEntity userEntity) {
-        TicketEntity ticketEntity = new TicketEntity();
-        ticketEntity.setUser(userEntity);
-        return ticketEntity;
-    }
 
 }
