@@ -25,10 +25,6 @@ public class WinnerEntity {
     @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
     private UserEntity user;
 
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "ticket_id", referencedColumnName = "id", nullable = false, unique = true)
-//    private TicketEntity ticket;
-
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ticket_id", referencedColumnName = "id", nullable = false, unique = true)
     private TicketEntity ticket;

@@ -11,6 +11,7 @@ public class UserSignupResponse {
 
     private Integer id;
     private String email;
+    private String nickname;
     private UserRole role;
 
     // User 객체를 UserSignupResponse 객체로 변환
@@ -18,6 +19,7 @@ public class UserSignupResponse {
         return new UserSignupResponse(
                 user.getId(),
                 user.getEmail(),
+                user.getNickname(),
                 user.getUserRole()
         );
     }

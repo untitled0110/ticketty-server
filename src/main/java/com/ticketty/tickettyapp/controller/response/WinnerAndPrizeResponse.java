@@ -10,6 +10,7 @@ import lombok.Setter;
 public class WinnerAndPrizeResponse {
 
     private Integer winner_user_id;
+    private String winner_nickname;
     private Integer ticket_id;
     private Integer prize_money;
 

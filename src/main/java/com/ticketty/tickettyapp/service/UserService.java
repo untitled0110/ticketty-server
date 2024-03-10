@@ -7,6 +7,7 @@ import com.ticketty.tickettyapp.model.User;
 import com.ticketty.tickettyapp.model.entity.UserEntity;
 import com.ticketty.tickettyapp.repository.UserEntityRepository;
 import com.ticketty.tickettyapp.util.JwtTokenUtils;
+import com.ticketty.tickettyapp.util.NicknameGenerator;
 import com.ticketty.tickettyapp.util.PasswordEncoder;
 import com.ticketty.tickettyapp.util.RedisUtil;
 import lombok.RequiredArgsConstructor;
@@ -31,8 +32,12 @@ public class UserService {
 
     @Transactional
     public User signUpUser(String email, String password) {
+        // 랜덤 닉네임 생성
+        String randomNickname = NicknameGenerator.generateNickname();
+        System.out.println("randomNickname!!!!!!!"+ randomNickname);
+
         // 회원가입 진행 = user를 등록
-        UserEntity userEntity = userEntityRepository.save(UserEntity.of(email, passwordEncoder.encrypt(email, password)));
+        UserEntity userEntity = userEntityRepository.save(UserEntity.of(email, randomNickname, passwordEncoder.encrypt(email, password)));
         return User.fromEntity(userEntity);
     }
 
