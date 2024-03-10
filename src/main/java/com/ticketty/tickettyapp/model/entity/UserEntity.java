@@ -25,6 +25,9 @@ public class UserEntity {
     @Column(name = "email", nullable = false)
     private String email;
 
+    @Column(name = "nickname", nullable = false)
+    private String nickname;
+
     @Column(name = "password", nullable = false)
     private String password;
 
@@ -51,9 +54,10 @@ public class UserEntity {
         this.updatedAt = Timestamp.from(Instant.now());
     }
 
-    public static UserEntity of(String email, String password) {
+    public static UserEntity of(String email, String nickname, String password) {
         UserEntity userEntity = new UserEntity();
         userEntity.setEmail(email);
+        userEntity.setNickname(nickname);
         userEntity.setPassword(password);
         return userEntity;
     }

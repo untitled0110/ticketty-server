@@ -38,6 +38,7 @@ public class WinnerService {
         if (!todayWinners.isEmpty()) {
             WinnerEntity winner = todayWinners.get(0);
             response.setWinner_user_id(winner.getUser().getId());
+            response.setWinner_nickname(winner.getUser().getNickname());
             response.setTicket_id(winner.getTicket().getId());
             response.setPrize_money(winner.getPrizeMoney());
         } else {

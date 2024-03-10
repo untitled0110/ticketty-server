@@ -11,6 +11,7 @@ import java.sql.Timestamp;
 public class User {
     private Integer id;
     private String email;
+    private String nickname;
     private String password;
     private UserRole userRole;
     private Timestamp registeredAt;
@@ -22,6 +23,7 @@ public class User {
         return new User(
                 entity.getId(),
                 entity.getEmail(),
+                entity.getNickname(),
                 entity.getPassword(),
                 entity.getRole(),
                 entity.getRegisteredAt(),

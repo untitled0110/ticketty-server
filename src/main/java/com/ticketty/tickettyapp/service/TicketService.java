@@ -41,8 +41,8 @@ public class TicketService {
     }
 
     @Transactional
-//    @Scheduled(cron = "0 0 21 * * ?") // 매일 오후 9시에 실행
-    @Scheduled(cron = "0 33 15 * * ?")
+//    @Scheduled(cron = "0 33 15 * * ?")
+    @Scheduled(cron = "0 8 21 * * ?") // 매일 오후 9시에 실행
     public void selectWinningTicketAndCalculatePrize() {
         LocalDateTime yesterdayTenPM = LocalDateTime.now().minusDays(1).withHour(22).withMinute(0).withSecond(0);
         LocalDateTime todayNinePM = LocalDateTime.now().withHour(21).withMinute(0).withSecond(0);
