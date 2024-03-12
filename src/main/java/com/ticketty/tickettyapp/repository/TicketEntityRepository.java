@@ -12,5 +12,8 @@ public interface TicketEntityRepository extends JpaRepository<TicketEntity, Inte
 
     List<TicketEntity> findByRegisteredAtBetween(Timestamp start, Timestamp end);
 
+    int countByRegisteredAtBetween(Timestamp start, Timestamp end);
+
+    int countByUser_IdAndRegisteredAtBetween(Integer userId, Timestamp start, Timestamp end);
 
 }

@@ -74,4 +74,22 @@ public class TicketService {
         }
     }
 
+    @Transactional(readOnly = true)
+    public int getTicketCount() {
+        LocalDateTime yesterdayTenPM = LocalDateTime.now().minusDays(1).withHour(22).withMinute(0).withSecond(0);
+        Timestamp startOfDay = Timestamp.valueOf(yesterdayTenPM);
+        Timestamp endOfDay = Timestamp.valueOf(LocalDateTime.now());
+
+        return ticketEntityRepository.countByRegisteredAtBetween(startOfDay, endOfDay);
+    }
+
+    @Transactional(readOnly = true)
+    public int getUserTicketCount(Integer userId) {
+        LocalDateTime yesterdayTenPM = LocalDateTime.now().minusDays(1).withHour(22).withMinute(0).withSecond(0);
+        Timestamp startOfDay = Timestamp.valueOf(yesterdayTenPM);
+        Timestamp endOfDay = Timestamp.valueOf(LocalDateTime.now());
+
+        return ticketEntityRepository.countByUser_IdAndRegisteredAtBetween(userId, startOfDay, endOfDay);
+    }
+
 }
