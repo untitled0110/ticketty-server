@@ -51,6 +51,7 @@ public class WinnerService {
             response.setWinner_nickname(winner.getUser().getNickname());
             response.setTicket_id(winner.getTicket().getId());
             response.setPrize_money(winner.getPrizeMoney());
+            response.setWinning_date(winner.getRegisteredAt());
         } else {
             throw new TickettyAppApplicationException(ErrorCode.WINNER_NOT_FOUND);
         }
