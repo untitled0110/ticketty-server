@@ -80,33 +80,36 @@ public class TicketService {
         }
     }
 
-    @Transactional(readOnly = true)
-    public PresentTicketCountAndPrizeMoneyResponse getPresentTicketCountAndPrizeMoney() {
-        LocalDateTime currentTime = LocalDateTime.now();
-//        LocalDateTime currentTime = LocalDateTime.of(2024, 3, 24, 22, 0, 0);
+    private Timestamp[] setDayBoundaries(LocalDateTime currentTime) {
         LocalDateTime startOfDay;
-        LocalDateTime endOfDay;
-
-        int ticketCount = 0;
-        int prizeMoney = 0;
-
-        System.out.println("currentTime: " + currentTime);
+        LocalDateTime endOfDay = LocalDateTime.now();
 
         if (currentTime.getHour() < 21) {
             startOfDay = LocalDateTime.now().minusDays(1).withHour(22).withMinute(0).withSecond(0);
-            endOfDay = LocalDateTime.now();
-        } else if (currentTime.getHour() == 21) {
-            return new PresentTicketCountAndPrizeMoneyResponse(0, 0);
         } else {
             startOfDay = LocalDateTime.now().withHour(22).withMinute(0).withSecond(0);
-            endOfDay = LocalDateTime.now();
         }
 
         Timestamp startTimestamp = Timestamp.valueOf(startOfDay);
         Timestamp endTimestamp = Timestamp.valueOf(endOfDay);
 
-        ticketCount = ticketEntityRepository.countByRegisteredAtBetween(startTimestamp, endTimestamp);
-        prizeMoney = ticketCount + defaultPrizeAmount;
+        return new Timestamp[]{startTimestamp, endTimestamp};
+    }
+
+    @Transactional(readOnly = true)
+    public PresentTicketCountAndPrizeMoneyResponse getPresentTicketCountAndPrizeMoney() {
+        LocalDateTime currentTime = LocalDateTime.now();
+
+        if (currentTime.getHour() == 21) {
+            return new PresentTicketCountAndPrizeMoneyResponse(0, 0);
+        }
+
+        Timestamp[] boundaries = setDayBoundaries(currentTime);
+        Timestamp startTimestamp = boundaries[0];
+        Timestamp endTimestamp = boundaries[1];
+
+        int ticketCount = ticketEntityRepository.countByRegisteredAtBetween(startTimestamp, endTimestamp);
+        int prizeMoney = ticketCount + defaultPrizeAmount;
 
         return new PresentTicketCountAndPrizeMoneyResponse(ticketCount, prizeMoney);
     }
@@ -114,22 +117,14 @@ public class TicketService {
     @Transactional(readOnly = true)
     public PresentUserTicketCountResponse getPresentUserTicketCount(Integer userId) {
         LocalDateTime currentTime = LocalDateTime.now();
-//        LocalDateTime currentTime = LocalDateTime.of(2024, 3, 24, 22, 0, 0);
-        LocalDateTime startOfDay;
-        LocalDateTime endOfDay;
 
-        if (currentTime.getHour() < 21) {
-            startOfDay = LocalDateTime.now().minusDays(1).withHour(22).withMinute(0).withSecond(0);
-            endOfDay = LocalDateTime.now();
-        } else if (currentTime.getHour() == 21) {
+        if (currentTime.getHour() == 21) {
             return new PresentUserTicketCountResponse(0);
-        } else {
-            startOfDay = LocalDateTime.now().withHour(22).withMinute(0).withSecond(0);
-            endOfDay = LocalDateTime.now();
         }
 
-        Timestamp startTimestamp = Timestamp.valueOf(startOfDay);
-        Timestamp endTimestamp = Timestamp.valueOf(endOfDay);
+        Timestamp[] boundaries = setDayBoundaries(currentTime);
+        Timestamp startTimestamp = boundaries[0];
+        Timestamp endTimestamp = boundaries[1];
 
         int ticketCount = ticketEntityRepository.countByUser_IdAndRegisteredAtBetween(userId, startTimestamp, endTimestamp);
 
