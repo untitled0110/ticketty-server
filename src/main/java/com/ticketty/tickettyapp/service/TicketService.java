@@ -10,6 +10,7 @@ import com.ticketty.tickettyapp.repository.TicketEntityRepository;
 import com.ticketty.tickettyapp.repository.UserEntityRepository;
 import com.ticketty.tickettyapp.repository.WinnerEntityRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,6 +27,9 @@ public class TicketService {
     private final TicketEntityRepository ticketEntityRepository;
     private final UserEntityRepository userEntityRepository;
     private final WinnerEntityRepository winnerEntityRepository;
+
+    @Value("${prize.default-amount}")
+    private int defaultPrizeAmount;
 
     @Transactional
     public IssueTicketResponse createTicket(Integer userId) {
@@ -55,7 +59,7 @@ public class TicketService {
 
         if (totalTickets > 0) {
             // 당첨금 계산
-            int prizeAmount = totalTickets; // 티켓 1장당 1원
+            int prizeAmount = totalTickets + defaultPrizeAmount; // 티켓 1장당 1원 + 기본 금액
             System.out.println("당첨금: " + prizeAmount + "원");
 
             // 당첨 티켓 선정
