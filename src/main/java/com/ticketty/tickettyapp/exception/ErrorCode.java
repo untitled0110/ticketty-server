@@ -40,6 +40,8 @@ public enum ErrorCode {
 //    INVALID_REFRESH_TOKEN(HttpStatus.BAD_REQUEST, "Refresh token contained in the header and refresh token stored in Redis do not match"),
 
     WINNER_NOT_FOUND(HttpStatus.OK, "No winner found today"),
+
+    NOT_TICKET_ISSUE_TIME(HttpStatus.OK, "This is not the time to issue tickets."),
     ;
 
     private HttpStatus status;
