@@ -39,10 +39,10 @@ public class TicketController {
 
 
     @GetMapping("/quantity")
-    public Response<PresentTicketCountAndPrizeMoneyResponse> getTicketCount() {
+    public Response<PresentTicketCountAndPrizeMoneyResponse> getTicketCountAndPrizeMoney() {
 
-        PresentTicketCountAndPrizeMoneyResponse ticketCountResponse = ticketService.getPresentTicketCountAndPrizeMoney();
-        return Response.success(ticketCountResponse);
+        PresentTicketCountAndPrizeMoneyResponse presentTicketCountAndPrizeMoneyResponse = ticketService.getPresentTicketCountAndPrizeMoney();
+        return Response.success(presentTicketCountAndPrizeMoneyResponse);
     }
 
     @GetMapping("/user-quantity")
@@ -50,7 +50,7 @@ public class TicketController {
 
         Integer userId = (Integer) httpServletRequest.getAttribute("userId");
 
-        int ticketCount = ticketService.getUserTicketCount(userId);
-        return Response.success(new PresentUserTicketCountResponse(ticketCount));
+        PresentUserTicketCountResponse presentUserTicketCountResponse = ticketService.getPresentUserTicketCount(userId);
+        return Response.success(presentUserTicketCountResponse);
     }
 }
