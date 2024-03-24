@@ -12,13 +12,13 @@ import java.sql.Timestamp;
 @AllArgsConstructor
 public class WinnerAndPrizeResponse {
 
-    private Integer winner_user_id;
-    private String winner_nickname;
-    private Integer ticket_id;
-    private Integer prize_money;
+    private Integer winnerUserId;
+    private String winnerNickname;
+    private Integer ticketId;
+    private Integer prizeMoney;
 
     @JsonFormat(pattern = "yyyy-MM-dd")
-    private Timestamp winning_date;
+    private Timestamp winningDate;
 
     public WinnerAndPrizeResponse() {
 

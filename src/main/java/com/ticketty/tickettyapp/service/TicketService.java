@@ -1,6 +1,7 @@
 package com.ticketty.tickettyapp.service;
 
 import com.ticketty.tickettyapp.controller.response.IssueTicketResponse;
+import com.ticketty.tickettyapp.controller.response.PresentTicketCountAndPrizeMoneyResponse;
 import com.ticketty.tickettyapp.exception.ErrorCode;
 import com.ticketty.tickettyapp.exception.TickettyAppApplicationException;
 import com.ticketty.tickettyapp.model.entity.TicketEntity;
@@ -79,12 +80,15 @@ public class TicketService {
     }
 
     @Transactional(readOnly = true)
-    public int getTicketCount() {
+    public PresentTicketCountAndPrizeMoneyResponse getPresentTicketCountAndPrizeMoney() {
         LocalDateTime yesterdayTenPM = LocalDateTime.now().minusDays(1).withHour(22).withMinute(0).withSecond(0);
         Timestamp startOfDay = Timestamp.valueOf(yesterdayTenPM);
         Timestamp endOfDay = Timestamp.valueOf(LocalDateTime.now());
 
-        return ticketEntityRepository.countByRegisteredAtBetween(startOfDay, endOfDay);
+        int ticketCount =  ticketEntityRepository.countByRegisteredAtBetween(startOfDay, endOfDay);
+        int prizeMoney =  ticketCount + defaultPrizeAmount;
+
+        return new PresentTicketCountAndPrizeMoneyResponse(ticketCount, prizeMoney);
     }
 
     @Transactional(readOnly = true)

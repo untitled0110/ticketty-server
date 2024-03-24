@@ -5,7 +5,8 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class TicketCountResponse {
+public class PresentUserTicketCountResponse {
 
     private Integer ticketCount;
 }
+

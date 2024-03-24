@@ -1,10 +1,12 @@
 package com.ticketty.tickettyapp.controller;
 
 import com.ticketty.tickettyapp.controller.response.IssueTicketResponse;
+import com.ticketty.tickettyapp.controller.response.PresentTicketCountAndPrizeMoneyResponse;
+import com.ticketty.tickettyapp.controller.response.PresentUserTicketCountResponse;
 import com.ticketty.tickettyapp.controller.response.Response;
-import com.ticketty.tickettyapp.controller.response.TicketCountResponse;
 import com.ticketty.tickettyapp.service.TicketService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,18 +31,18 @@ public class TicketController {
     }
 
     @GetMapping("/quantity")
-    public Response<TicketCountResponse> getTicketCount() {
+    public Response<PresentTicketCountAndPrizeMoneyResponse> getTicketCount() {
 
-        int ticketCount = ticketService.getTicketCount();
-        return Response.success(new TicketCountResponse(ticketCount));
+        PresentTicketCountAndPrizeMoneyResponse ticketCountResponse = ticketService.getPresentTicketCountAndPrizeMoney();
+        return Response.success(ticketCountResponse);
     }
 
     @GetMapping("/user-quantity")
-    public Response<TicketCountResponse> getUserTicketCount(HttpServletRequest httpServletRequest) {
+    public Response<PresentUserTicketCountResponse> getUserTicketCount(HttpServletRequest httpServletRequest) {
 
         Integer userId = (Integer) httpServletRequest.getAttribute("userId");
 
         int ticketCount = ticketService.getUserTicketCount(userId);
-        return Response.success(new TicketCountResponse(ticketCount));
+        return Response.success(new PresentUserTicketCountResponse(ticketCount));
     }
 }

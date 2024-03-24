@@ -47,11 +47,11 @@ public class WinnerService {
 
         if (!todayWinners.isEmpty()) {
             WinnerEntity winner = todayWinners.get(0);
-            response.setWinner_user_id(winner.getUser().getId());
-            response.setWinner_nickname(winner.getUser().getNickname());
-            response.setTicket_id(winner.getTicket().getId());
-            response.setPrize_money(winner.getPrizeMoney());
-            response.setWinning_date(winner.getRegisteredAt());
+            response.setWinnerUserId(winner.getUser().getId());
+            response.setWinnerNickname(winner.getUser().getNickname());
+            response.setTicketId(winner.getTicket().getId());
+            response.setPrizeMoney(winner.getPrizeMoney());
+            response.setWinningDate(winner.getRegisteredAt());
         } else {
             throw new TickettyAppApplicationException(ErrorCode.WINNER_NOT_FOUND);
         }
