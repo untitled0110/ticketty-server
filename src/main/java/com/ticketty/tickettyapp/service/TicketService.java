@@ -84,7 +84,7 @@ public class TicketService {
         LocalDateTime startOfDay;
         LocalDateTime endOfDay = LocalDateTime.now();
 
-        if (currentTime.getHour() < 21) {
+        if (currentTime.getHour() < 22) {
             startOfDay = LocalDateTime.now().minusDays(1).withHour(22).withMinute(0).withSecond(0);
         } else {
             startOfDay = LocalDateTime.now().withHour(22).withMinute(0).withSecond(0);
@@ -100,9 +100,9 @@ public class TicketService {
     public PresentTicketCountAndPrizeMoneyResponse getPresentTicketCountAndPrizeMoney() {
         LocalDateTime currentTime = LocalDateTime.now();
 
-        if (currentTime.getHour() == 21) {
-            return new PresentTicketCountAndPrizeMoneyResponse(0, 0);
-        }
+//        if (currentTime.getHour() == 21) {
+//            return new PresentTicketCountAndPrizeMoneyResponse(0, 0);
+//        }
 
         Timestamp[] boundaries = setDayBoundaries(currentTime);
         Timestamp startTimestamp = boundaries[0];
@@ -118,9 +118,9 @@ public class TicketService {
     public PresentUserTicketCountResponse getPresentUserTicketCount(Integer userId) {
         LocalDateTime currentTime = LocalDateTime.now();
 
-        if (currentTime.getHour() == 21) {
-            return new PresentUserTicketCountResponse(0);
-        }
+//        if (currentTime.getHour() == 21) {
+//            return new PresentUserTicketCountResponse(0);
+//        }
 
         Timestamp[] boundaries = setDayBoundaries(currentTime);
         Timestamp startTimestamp = boundaries[0];
