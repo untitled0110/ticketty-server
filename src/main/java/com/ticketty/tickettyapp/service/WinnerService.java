@@ -24,11 +24,11 @@ public class WinnerService {
         Timestamp startOfDay;
         Timestamp endOfDay;
 
-        // 현재 시간이 오후 9시 이전인 경우
-        if (LocalTime.now().isBefore(LocalTime.of(21, 0))) {
+        // 현재 시간이 22시 이전인 경우
+        if (LocalTime.now().isBefore(LocalTime.of(22, 0))) {
             startOfDay = Timestamp.valueOf(LocalDate.now().minusDays(1).atTime(LocalTime.of(21, 0))); // 어제 오후 9시
             endOfDay = Timestamp.valueOf(LocalDate.now().atTime(LocalTime.of(20, 59, 59))); // 오늘 오후 8시 59분 59초
-        } else { // 현재 시간이 오후 9시 이후인 경우
+        } else { // 현재 시간이 22시 이후인 경우
             startOfDay = Timestamp.valueOf(LocalDate.now().atTime(LocalTime.of(21, 0))); // 오늘 오후 9시
             endOfDay = Timestamp.valueOf(LocalDate.now().plusDays(1).atTime(LocalTime.of(20, 59, 59))); // 내일 오후 8시 59분 59초
         }
