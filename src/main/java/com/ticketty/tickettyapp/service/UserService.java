@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
@@ -159,12 +160,42 @@ public class UserService {
         userEntityRepository.save(userEntity);
     }
 
-    @Transactional
     public User getUserInfo(Integer userId) {
         UserEntity userEntity = userEntityRepository.findById(userId)
                 .orElseThrow(() -> new TickettyAppApplicationException(ErrorCode.USER_NOT_FOUND));
 
         return User.fromEntity(userEntity);
+    }
+
+    @Transactional
+    public void changeNickname(Integer userId, String newNickname) {
+//        UserEntity userEntity = userEntityRepository.findById(userId)
+//                .orElseThrow(() -> new TickettyAppApplicationException(ErrorCode.USER_NOT_FOUND));
+
+        Optional<UserEntity> existingUser = userEntityRepository.findByNickname(newNickname);
+        if (existingUser.isPresent()) {
+            throw new TickettyAppApplicationException(ErrorCode.DUPLICATED_NICKNAME, "닉네임이 이미 사용 중입니다.");
+        }
+
+        userEntityRepository.updateNicknameById(userId, newNickname);
+    }
+
+    @Transactional
+    public void changePhone(Integer userId, String phoneNumber) {
+//        UserEntity userEntity = userEntityRepository.findById(userId)
+//                .orElseThrow(() -> new TickettyAppApplicationException(ErrorCode.USER_NOT_FOUND));
+
+        Optional<UserEntity> existingUser = userEntityRepository.findByPhone(phoneNumber);
+        if (existingUser.isPresent()) {
+            throw new TickettyAppApplicationException(ErrorCode.DUPLICATED_PHONE, "휴대폰 번호가 이미 사용 중입니다.");
+        }
+
+        userEntityRepository.updatePhoneById(userId, phoneNumber);
+    }
+
+    @Transactional
+    public void changeAccount(Integer userId, String bankName, String accountNumber) {
+        userEntityRepository.updateAccountInfoById(userId, bankName, accountNumber);
     }
 
 }

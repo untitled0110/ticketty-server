@@ -1,15 +1,19 @@
 package com.ticketty.tickettyapp.controller;
 
-import com.ticketty.tickettyapp.controller.request.UserLoginRequest;
-import com.ticketty.tickettyapp.controller.request.UserSignupRequest;
+import com.ticketty.tickettyapp.controller.request.*;
 import com.ticketty.tickettyapp.controller.response.*;
+import com.ticketty.tickettyapp.exception.ErrorCode;
+import com.ticketty.tickettyapp.exception.TickettyAppApplicationException;
 import com.ticketty.tickettyapp.model.User;
 import com.ticketty.tickettyapp.service.MailService;
 import com.ticketty.tickettyapp.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
+import java.util.Objects;
 
 @RestController
 @RequiredArgsConstructor
@@ -72,4 +76,47 @@ public class UserController {
         User user = userService.getUserInfo(userId);
         return Response.success(MyPageResponse.fromUser(user));
     }
+
+    @PutMapping("/nickname")
+    public Response<Void> changeNickname(HttpServletRequest httpServletRequest, @Valid @RequestBody ChangeNicknameRequest request, Errors errors) {
+        Integer userId = (Integer) httpServletRequest.getAttribute("userId");
+        String newNickname = request.getNewNickname();
+
+        if (errors.hasErrors()) {
+            String errorMessage = Objects.requireNonNull(errors.getFieldError("newNickname")).getDefaultMessage();
+            throw new TickettyAppApplicationException(ErrorCode.NICKNAME_VALIDATION, (errorMessage));
+        }
+
+        userService.changeNickname(userId, newNickname);
+        return Response.success(null);
+    }
+
+    @PutMapping("/phone")
+    public Response<Void> changePhone(HttpServletRequest httpServletRequest, @Valid @RequestBody ChangePhoneRequest request, Errors errors) {
+        Integer userId = (Integer) httpServletRequest.getAttribute("userId");
+        String phoneNumber= request.getPhone();
+
+        if (errors.hasErrors()) {
+            String errorMessage = Objects.requireNonNull(errors.getFieldError("phone")).getDefaultMessage();
+            throw new TickettyAppApplicationException(ErrorCode.PHONE_VALIDATION, (errorMessage));
+        }
+
+        userService.changePhone(userId, phoneNumber);
+        return Response.success(null);
+    }
+
+    @PutMapping("/account")
+    public Response<Void> changeAccount(HttpServletRequest httpServletRequest, @Valid @RequestBody ChangeAccountRequest request, Errors errors) {
+        Integer userId = (Integer) httpServletRequest.getAttribute("userId");
+        String bankName= request.getBankName();
+        String accountNumber= request.getAccountNumber();
+
+        if (errors.hasErrors()) {
+            throw new TickettyAppApplicationException(ErrorCode.ACCOUNT_VALIDATION);
+        }
+
+        userService.changeAccount(userId, bankName, accountNumber);
+        return Response.success(null);
+    }
+
 }

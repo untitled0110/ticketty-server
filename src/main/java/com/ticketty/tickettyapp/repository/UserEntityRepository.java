@@ -1,7 +1,10 @@
 package com.ticketty.tickettyapp.repository;
 
 import com.ticketty.tickettyapp.model.entity.UserEntity;
+import io.lettuce.core.dynamic.annotation.Param;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
@@ -13,4 +16,20 @@ public interface UserEntityRepository extends JpaRepository<UserEntity, Integer>
 
     @Override
     Optional<UserEntity> findById(Integer integer);
+
+    Optional<UserEntity> findByNickname(String nickname);
+
+    Optional<UserEntity> findByPhone(String nickname);
+
+    @Modifying
+    @Query("UPDATE UserEntity u SET u.nickname = :nickname WHERE u.id = :userId")
+    void updateNicknameById(@Param("userId") Integer userId, @Param("nickname") String nickname);
+
+    @Modifying
+    @Query("UPDATE UserEntity u SET u.phone = :phoneNumber WHERE u.id = :userId")
+    void updatePhoneById(@Param("userId") Integer userId, @Param("phoneNumber") String phoneNumber);
+
+    @Modifying
+    @Query("UPDATE UserEntity u SET u.account_number = :accountNumber, u.bank_name = :bankName WHERE u.id = :userId")
+    void updateAccountInfoById(@Param("userId") Integer userId, @Param("accountNumber") String accountNumber, @Param("bankName") String bankName);
 }
