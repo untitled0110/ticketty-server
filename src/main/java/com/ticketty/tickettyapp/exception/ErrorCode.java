@@ -20,6 +20,14 @@ public enum ErrorCode {
     EXPIRED_CODE(HttpStatus.OK, "Code has expired"),
     EMAIL_AUTHENTICATION_FAILED(HttpStatus.OK, "Email authentication failed"),
 
+    NICKNAME_VALIDATION(HttpStatus.OK, "Nickname validation failed"),
+    DUPLICATED_NICKNAME(HttpStatus.OK, "Nickname is duplicated"),
+
+    PHONE_VALIDATION(HttpStatus.OK, "Phone validation failed"),
+    DUPLICATED_PHONE(HttpStatus.OK, "Phone is duplicated"),
+
+    ACCOUNT_VALIDATION(HttpStatus.OK, "Account validation failed"),
+
 //    USER_NOT_FOUND(HttpStatus.NOT_FOUND, "User not founded"),
 //    INVALID_PASSWORD(HttpStatus.UNAUTHORIZED, "Password is invalid"),
 
