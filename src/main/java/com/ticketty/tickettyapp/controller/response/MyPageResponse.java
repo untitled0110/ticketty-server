@@ -13,6 +13,7 @@ public class MyPageResponse {
     private String phone;
     private String accountNumber;
     private String bankName;
+    private String accountHolder;
 
     // User 객체를 MyPageResponse 객체로 변환
     public static MyPageResponse fromUser(User user) {
@@ -21,7 +22,8 @@ public class MyPageResponse {
                 user.getNickname(),
                 user.getPhone(),
                 user.getAccountNumber(),
-                user.getBankName()
+                user.getBankName(),
+                user.getAccountHolder()
         );
     }
 }

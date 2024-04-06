@@ -16,6 +16,7 @@ public class User {
     private String phone;
     private String accountNumber;
     private String bankName;
+    private String accountHolder;
     private UserRole userRole;
     private Timestamp registeredAt;
     private Timestamp updatedAt;
@@ -31,6 +32,7 @@ public class User {
                 entity.getPhone(),
                 entity.getAccount_number(),
                 entity.getBank_name(),
+                entity.getAccount_holder(),
                 entity.getRole(),
                 entity.getRegisteredAt(),
                 entity.getUpdatedAt(),

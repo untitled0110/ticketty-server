@@ -40,6 +40,9 @@ public class UserEntity {
     @Column(name = "bank_name")
     private String bank_name;
 
+    @Column(name = "account_holder")
+    private String account_holder;
+
     @Column(name = "role")
     @Enumerated(EnumType.STRING)
     private UserRole role = UserRole.USER;

@@ -110,12 +110,13 @@ public class UserController {
         Integer userId = (Integer) httpServletRequest.getAttribute("userId");
         String bankName= request.getBankName();
         String accountNumber= request.getAccountNumber();
+        String accountHolder= request.getAccountHolder();
 
         if (errors.hasErrors()) {
             throw new TickettyAppApplicationException(ErrorCode.ACCOUNT_VALIDATION);
         }
 
-        userService.changeAccount(userId, bankName, accountNumber);
+        userService.changeAccount(userId, accountNumber, bankName, accountHolder);
         return Response.success(null);
     }
 

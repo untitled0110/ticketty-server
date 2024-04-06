@@ -194,8 +194,8 @@ public class UserService {
     }
 
     @Transactional
-    public void changeAccount(Integer userId, String bankName, String accountNumber) {
-        userEntityRepository.updateAccountInfoById(userId, bankName, accountNumber);
+    public void changeAccount(Integer userId, String accountNumber, String bankName, String accountHolder) {
+        userEntityRepository.updateAccountInfoById(userId, accountNumber, bankName, accountHolder);
     }
 
 }
