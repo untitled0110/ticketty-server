@@ -2,9 +2,7 @@ package com.ticketty.tickettyapp.controller;
 
 import com.ticketty.tickettyapp.controller.request.UserLoginRequest;
 import com.ticketty.tickettyapp.controller.request.UserSignupRequest;
-import com.ticketty.tickettyapp.controller.response.Response;
-import com.ticketty.tickettyapp.controller.response.UserLoginResponse;
-import com.ticketty.tickettyapp.controller.response.UserSignupResponse;
+import com.ticketty.tickettyapp.controller.response.*;
 import com.ticketty.tickettyapp.model.User;
 import com.ticketty.tickettyapp.service.MailService;
 import com.ticketty.tickettyapp.service.UserService;
@@ -66,4 +64,12 @@ public class UserController {
         return Response.success(null);
     }
 
+    @GetMapping("/my-info")
+    public Response<MyPageResponse> getUserInfo(HttpServletRequest httpServletRequest) {
+
+        Integer userId = (Integer) httpServletRequest.getAttribute("userId");
+
+        User user = userService.getUserInfo(userId);
+        return Response.success(MyPageResponse.fromUser(user));
+    }
 }

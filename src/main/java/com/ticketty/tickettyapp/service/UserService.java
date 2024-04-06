@@ -159,6 +159,14 @@ public class UserService {
         userEntityRepository.save(userEntity);
     }
 
+    @Transactional
+    public User getUserInfo(Integer userId) {
+        UserEntity userEntity = userEntityRepository.findById(userId)
+                .orElseThrow(() -> new TickettyAppApplicationException(ErrorCode.USER_NOT_FOUND));
+
+        return User.fromEntity(userEntity);
+    }
+
 }
 
 

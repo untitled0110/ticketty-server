@@ -31,6 +31,15 @@ public class UserEntity {
     @Column(name = "password", nullable = false)
     private String password;
 
+    @Column(name = "phone")
+    private String phone;
+
+    @Column(name = "account_number")
+    private String account_number;
+
+    @Column(name = "bank_name")
+    private String bank_name;
+
     @Column(name = "role")
     @Enumerated(EnumType.STRING)
     private UserRole role = UserRole.USER;

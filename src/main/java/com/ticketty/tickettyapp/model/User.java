@@ -13,6 +13,9 @@ public class User {
     private String email;
     private String nickname;
     private String password;
+    private String phone;
+    private String accountNumber;
+    private String bankName;
     private UserRole userRole;
     private Timestamp registeredAt;
     private Timestamp updatedAt;
@@ -25,6 +28,9 @@ public class User {
                 entity.getEmail(),
                 entity.getNickname(),
                 entity.getPassword(),
+                entity.getPhone(),
+                entity.getAccount_number(),
+                entity.getBank_name(),
                 entity.getRole(),
                 entity.getRegisteredAt(),
                 entity.getUpdatedAt(),
