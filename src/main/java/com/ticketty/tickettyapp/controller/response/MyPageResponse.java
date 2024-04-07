@@ -8,6 +8,7 @@ import lombok.Getter;
 @AllArgsConstructor
 public class MyPageResponse {
 
+    private Integer userId;
     private String email;
     private String nickname;
     private String phone;
@@ -18,6 +19,7 @@ public class MyPageResponse {
     // User 객체를 MyPageResponse 객체로 변환
     public static MyPageResponse fromUser(User user) {
         return new MyPageResponse(
+                user.getId(),
                 user.getEmail(),
                 user.getNickname(),
                 user.getPhone(),
