@@ -3,6 +3,7 @@ package com.ticketty.tickettyapp.service;
 import com.ticketty.tickettyapp.controller.response.IssueTicketResponse;
 import com.ticketty.tickettyapp.controller.response.PresentTicketCountAndPrizeMoneyResponse;
 import com.ticketty.tickettyapp.controller.response.PresentUserTicketCountResponse;
+import com.ticketty.tickettyapp.controller.response.UserTicketRankingResponse;
 import com.ticketty.tickettyapp.exception.ErrorCode;
 import com.ticketty.tickettyapp.exception.TickettyAppApplicationException;
 import com.ticketty.tickettyapp.model.entity.TicketEntity;
@@ -13,6 +14,7 @@ import com.ticketty.tickettyapp.repository.UserEntityRepository;
 import com.ticketty.tickettyapp.repository.WinnerEntityRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,6 +23,7 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -129,6 +132,24 @@ public class TicketService {
         int ticketCount = ticketEntityRepository.countByUser_IdAndRegisteredAtBetween(userId, startTimestamp, endTimestamp);
 
         return new PresentUserTicketCountResponse(ticketCount);
+    }
+
+
+    @Transactional(readOnly = true)
+    public List<UserTicketRankingResponse> getTicketIssuanceRanking() {
+        LocalDateTime currentTime = LocalDateTime.now();
+
+        Timestamp[] boundaries = setDayBoundaries(currentTime);
+        Timestamp startTimestamp = boundaries[0];
+        Timestamp endTimestamp = boundaries[1];
+
+        PageRequest pageRequest = PageRequest.of(0, 10);
+
+        List<Object[]> topUsers = ticketEntityRepository.findTop10UsersByTicketCount(startTimestamp, endTimestamp, pageRequest);
+
+        return topUsers.stream()
+                .map(record -> new UserTicketRankingResponse((Integer) record[0], (Long) record[2], (String) record[1]))
+                .collect(Collectors.toList());
     }
 
 }

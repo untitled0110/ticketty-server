@@ -1,9 +1,6 @@
 package com.ticketty.tickettyapp.controller;
 
-import com.ticketty.tickettyapp.controller.response.IssueTicketResponse;
-import com.ticketty.tickettyapp.controller.response.PresentTicketCountAndPrizeMoneyResponse;
-import com.ticketty.tickettyapp.controller.response.PresentUserTicketCountResponse;
-import com.ticketty.tickettyapp.controller.response.Response;
+import com.ticketty.tickettyapp.controller.response.*;
 import com.ticketty.tickettyapp.exception.ErrorCode;
 import com.ticketty.tickettyapp.exception.TickettyAppApplicationException;
 import com.ticketty.tickettyapp.service.TicketService;
@@ -15,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -52,5 +50,11 @@ public class TicketController {
 
         PresentUserTicketCountResponse presentUserTicketCountResponse = ticketService.getPresentUserTicketCount(userId);
         return Response.success(presentUserTicketCountResponse);
+    }
+
+    @GetMapping("/ranking")
+    public Response<List<UserTicketRankingResponse>> getTicketIssuanceRanking() {
+        List<UserTicketRankingResponse> ranking = ticketService.getTicketIssuanceRanking();
+        return Response.success(ranking);
     }
 }
