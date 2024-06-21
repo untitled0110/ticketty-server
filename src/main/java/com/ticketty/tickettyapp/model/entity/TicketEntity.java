@@ -47,10 +47,17 @@ public class TicketEntity {
     @OneToOne(mappedBy = "ticket", fetch = FetchType.LAZY)
     private WinnerEntity winner;
 
+    public TicketEntity() {
+    }
+
     public static TicketEntity of(UserEntity userEntity) {
         TicketEntity ticketEntity = new TicketEntity();
         ticketEntity.setUser(userEntity);
         return ticketEntity;
+    }
+
+    public TicketEntity(UserEntity user) {
+        this.user = user;
     }
 
 }
