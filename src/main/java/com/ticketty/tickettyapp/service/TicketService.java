@@ -148,7 +148,12 @@ public class TicketService {
         List<Object[]> topUsers = ticketEntityRepository.findTop10UsersByTicketCount(startTimestamp, endTimestamp, pageRequest);
 
         return topUsers.stream()
-                .map(record -> new UserTicketRankingResponse((Integer) record[0], (Long) record[2], (String) record[1]))
+                .map(record -> new UserTicketRankingResponse(
+                        (Integer) record[0],  // userId
+                        (Long) record[2],     // ticketCount
+                        (String) record[1],   // nickname
+                        (Timestamp) record[3] // latestCreatedAt
+                ))
                 .collect(Collectors.toList());
     }
 
