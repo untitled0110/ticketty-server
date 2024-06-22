@@ -14,6 +14,9 @@ public enum ErrorCode {
 //    EXPIRED_CODE(HttpStatus.BAD_REQUEST, "Code has expired"),
 //    AUTHENTICATION_FAILED(HttpStatus.BAD_REQUEST, "Email authentication failed"),
 
+
+    NULL_INPUT(HttpStatus.BAD_REQUEST,"입력값이 null이면 안됩니다."),
+
     EMAIL_VALIDATION(HttpStatus.OK, "Email validation failed"),
     PASSWORD_VALIDATION(HttpStatus.OK, "Password validation failed"),
     DUPLICATED_EMAIL(HttpStatus.OK, "Email is duplicated"),

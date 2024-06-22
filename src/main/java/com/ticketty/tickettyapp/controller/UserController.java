@@ -108,7 +108,7 @@ public class UserController {
     @PutMapping("/account")
     public Response<Void> changeAccount(HttpServletRequest httpServletRequest, @Valid @RequestBody ChangeAccountRequest request, Errors errors) {
         Integer userId = (Integer) httpServletRequest.getAttribute("userId");
-        String bankName= request.getBankName();
+        String bankName = request.getBankName();
         String accountNumber= request.getAccountNumber();
         String accountHolder= request.getAccountHolder();
 
@@ -121,11 +121,17 @@ public class UserController {
     }
 
     @PutMapping("/emoji")
-    public Response<Void> changeEmoji(HttpServletRequest httpServletRequest, @RequestBody ChangeEmojiRequest request) {
+    public Response<Void> changeEmoji(HttpServletRequest httpServletRequest, @Valid @RequestBody ChangeEmojiRequest request, Errors errors) {
         Integer userId = (Integer) httpServletRequest.getAttribute("userId");
-        String emoji= request.getEmoji();
+        String emoji = request.getEmoji();
+
+        if (errors.hasErrors()) {
+            String errorMessage = Objects.requireNonNull(errors.getFieldError("emoji")).getDefaultMessage();
+            throw new TickettyAppApplicationException(ErrorCode.NULL_INPUT, errorMessage);
+        }
 
         userService.changeEmoji(userId, emoji);
+
         return Response.success(null);
     }
 
