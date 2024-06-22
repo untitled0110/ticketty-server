@@ -32,4 +32,9 @@ public interface UserEntityRepository extends JpaRepository<UserEntity, Integer>
     @Modifying
     @Query("UPDATE UserEntity u SET u.account_number = :accountNumber, u.bank_name = :bankName, u.account_holder = :accountHolder WHERE u.id = :userId")
     void updateAccountInfoById(@Param("userId") Integer userId, @Param("accountNumber") String accountNumber, @Param("bankName") String bankName, @Param("accountHolder") String accountHolder);
+
+    @Modifying
+    @Query("UPDATE UserEntity u SET u.emoji = :emoji WHERE u.id = :userId")
+    void updateEmojiById(@Param("userId") Integer userId, @Param("emoji") String emoji);
+
 }

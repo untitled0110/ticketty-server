@@ -120,4 +120,13 @@ public class UserController {
         return Response.success(null);
     }
 
+    @PutMapping("/emoji")
+    public Response<Void> changeEmoji(HttpServletRequest httpServletRequest, @RequestBody ChangeEmojiRequest request) {
+        Integer userId = (Integer) httpServletRequest.getAttribute("userId");
+        String emoji= request.getEmoji();
+
+        userService.changeEmoji(userId, emoji);
+        return Response.success(null);
+    }
+
 }

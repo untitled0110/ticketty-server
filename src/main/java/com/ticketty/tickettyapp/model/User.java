@@ -17,6 +17,7 @@ public class User {
     private String accountNumber;
     private String bankName;
     private String accountHolder;
+    private String emoji;
     private UserRole userRole;
     private Timestamp registeredAt;
     private Timestamp updatedAt;
@@ -33,6 +34,7 @@ public class User {
                 entity.getAccount_number(),
                 entity.getBank_name(),
                 entity.getAccount_holder(),
+                entity.getEmoji(),
                 entity.getRole(),
                 entity.getRegisteredAt(),
                 entity.getUpdatedAt(),

@@ -12,6 +12,7 @@ public class MyPageResponse {
     private String email;
     private String nickname;
     private String phone;
+    private String emoji;
     private String accountNumber;
     private String bankName;
     private String accountHolder;
@@ -23,6 +24,7 @@ public class MyPageResponse {
                 user.getEmail(),
                 user.getNickname(),
                 user.getPhone(),
+                user.getEmoji(),
                 user.getAccountNumber(),
                 user.getBankName(),
                 user.getAccountHolder()

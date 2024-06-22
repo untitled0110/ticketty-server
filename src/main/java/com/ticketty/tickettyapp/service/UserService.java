@@ -198,6 +198,10 @@ public class UserService {
         userEntityRepository.updateAccountInfoById(userId, accountNumber, bankName, accountHolder);
     }
 
+    @Transactional
+    public void changeEmoji(Integer userId, String emoji) {
+        userEntityRepository.updateEmojiById(userId, emoji);
+    }
 }
 
 

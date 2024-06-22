@@ -43,6 +43,9 @@ public class UserEntity {
     @Column(name = "account_holder")
     private String account_holder;
 
+    @Column(name = "emoji")
+    private String emoji;
+
     @Column(name = "role")
     @Enumerated(EnumType.STRING)
     private UserRole role = UserRole.USER;
