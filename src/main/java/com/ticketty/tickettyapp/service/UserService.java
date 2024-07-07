@@ -1,5 +1,6 @@
 package com.ticketty.tickettyapp.service;
 
+import com.ticketty.tickettyapp.controller.response.Response;
 import com.ticketty.tickettyapp.controller.response.UserLoginResponse;
 import com.ticketty.tickettyapp.exception.ErrorCode;
 import com.ticketty.tickettyapp.exception.TickettyAppApplicationException;
@@ -12,12 +13,17 @@ import com.ticketty.tickettyapp.util.PasswordEncoder;
 import com.ticketty.tickettyapp.util.RedisUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestTemplate;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.Date;
-import java.util.Optional;
+import java.sql.Timestamp;
+import java.time.Instant;
+import java.util.*;
 
 @RequiredArgsConstructor
 @Service
@@ -26,10 +32,26 @@ public class UserService {
     @Value("${jwt.token.expired-time-ms.refresh}")
     private Long refreshTokenExpiredTimeMs;
 
+    @Value("${niceapi.client_id}")
+    private String clientId;
+
+    @Value("${niceapi.client_secret}")
+    private String clientSecret;
+
+    @Value("${niceapi.product_id}")
+    private String productId;
+
+    @Value("${niceapi.get_token_url}")
+    private String getTokenUrl;
+
+    @Value("${niceapi.account_holder_url}")
+    private String accountHolderUrl;
+
     private final UserEntityRepository userEntityRepository;
     private final PasswordEncoder passwordEncoder;
     private final RedisUtil redisUtil;
     private final JwtTokenUtils jwtTokenUtils;
+    private final RestTemplate restTemplate;
 
     @Transactional
     public User signUpUser(String email, String password) {
@@ -202,6 +224,95 @@ public class UserService {
     public void changeEmoji(Integer userId, String emoji) {
         userEntityRepository.updateEmojiById(userId, emoji);
     }
+
+    @Transactional
+    public Response<Void> verifyAccount(String acctGb, String bnkCd, String acctNo, String name, Integer userId) {
+
+        UserEntity existingUser = userEntityRepository.findById(userId)
+                .orElseThrow(() -> new TickettyAppApplicationException(ErrorCode.USER_NOT_FOUND, String.format("%s not founded", userId)));
+
+        if (bnkCd.equals(existingUser.getBankName()) && acctNo.equals(existingUser.getAccountNumber())) {
+            throw new TickettyAppApplicationException(ErrorCode.ALREADY_REGISTERED_ACCOUNT);
+        }
+
+        boolean accountExists = userEntityRepository.existsByBankNameAndAccountNumber(bnkCd, acctNo);
+        if (accountExists) {
+            throw new TickettyAppApplicationException(ErrorCode.DUPLICATED_ACCOUNT);
+        }
+
+        String accessToken = getAccessToken();
+
+        String timestamp = String.valueOf(new Date().getTime() / 1000);
+        String authorization = "bearer " + Base64.getEncoder().encodeToString((accessToken + ":" + timestamp + ":" + clientId).getBytes());
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set("Authorization", authorization);
+        headers.set("client_id", clientId);
+        headers.set("productID", productId);
+
+        Map<String, Object> body = new HashMap<>();
+        Map<String, String> dataHeader = new HashMap<>();
+        dataHeader.put("CNTY_CD", "ko");
+        body.put("dataHeader", dataHeader);
+
+        Map<String, String> dataBody = new HashMap<>();
+        dataBody.put("acct_gb", acctGb);
+        dataBody.put("bnk_cd", bnkCd);
+        dataBody.put("acct_no", acctNo);
+        dataBody.put("name", name);
+        body.put("dataBody", dataBody);
+
+        HttpEntity<Map<String, Object>> entity = new HttpEntity<>(body, headers);
+        ResponseEntity<Map> response = restTemplate.exchange(
+                accountHolderUrl,
+                HttpMethod.POST,
+                entity,
+                Map.class
+        );
+
+        System.out.println("Response from account holder API: " + response.getBody());
+
+        Map<String, Object> responseBody = response.getBody();
+        Map<String, Object> responseDataBody = (Map<String, Object>) responseBody.get("dataBody");
+
+        String resultCode = (String) responseDataBody.get("result_cd");
+
+        // 유저 테이블 계좌 정보 업데이트
+        updateUserAccountInfo(userId, acctNo, bnkCd, name);
+
+        return new Response<>(resultCode, null);
+    }
+
+    private void updateUserAccountInfo(Integer userId, String accountNumber, String bankName, String accountHolder) {
+        Timestamp accountRegisteredAt = Timestamp.from(Instant.now());
+        userEntityRepository.updateAccountInfo(userId, accountNumber, bankName, accountHolder, accountRegisteredAt);
+    }
+
+    private String getAccessToken() {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        String auth = "Basic " + Base64.getEncoder().encodeToString((clientId + ":" + clientSecret).getBytes());
+        headers.set("Authorization", auth);
+
+        MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
+        body.add("grant_type", "client_credentials");
+        body.add("scope", "default");
+
+        HttpEntity<MultiValueMap<String, String>> entity = new HttpEntity<>(body, headers);
+        ResponseEntity<Map> response = restTemplate.postForEntity(
+                getTokenUrl,
+                entity,
+                Map.class
+        );
+
+        System.out.println("Response from token API: " + response.getBody());
+
+        Map<String, Object> responseBody = (Map<String, Object>) response.getBody().get("dataBody");
+        return (String) responseBody.get("access_token");
+    }
+
+
 }
 
 

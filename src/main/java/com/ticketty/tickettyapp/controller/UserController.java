@@ -135,4 +135,25 @@ public class UserController {
         return Response.success(null);
     }
 
+    @PostMapping("/account/verify")
+    public Response<Void> verifyAccount(
+            HttpServletRequest httpServletRequest,
+            @RequestParam(required = false) String acctGb,
+            @RequestParam(required = false) String bnkCd,
+            @RequestParam(required = false) String acctNo,
+            @RequestParam(required = false) String name) {
+
+        Integer userId = (Integer) httpServletRequest.getAttribute("userId");
+
+        if (isNullOrEmpty(acctGb) || isNullOrEmpty(bnkCd) || isNullOrEmpty(acctNo) || isNullOrEmpty(name)) {
+            throw new TickettyAppApplicationException(ErrorCode.MISSING_REQUIRED_PARAMETER);
+        }
+
+        return userService.verifyAccount(acctGb, bnkCd, acctNo, name, userId);
+    }
+
+    private boolean isNullOrEmpty(String value) {
+        return value == null || value.trim().isEmpty();
+    }
+
 }
