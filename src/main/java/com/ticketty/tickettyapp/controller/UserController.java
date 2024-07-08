@@ -137,6 +137,7 @@ public class UserController {
 
     @PostMapping("/account/verify")
     public Response<Void> verifyAccount(
+
             HttpServletRequest httpServletRequest,
             @RequestParam(required = false) String acctGb,
             @RequestParam(required = false) String bnkCd,

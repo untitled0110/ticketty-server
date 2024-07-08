@@ -274,14 +274,52 @@ public class UserService {
         System.out.println("Response from account holder API: " + response.getBody());
 
         Map<String, Object> responseBody = response.getBody();
-        Map<String, Object> responseDataBody = (Map<String, Object>) responseBody.get("dataBody");
+        Map<String, Object> responseDataHeader = (Map<String, Object>) responseBody.get("dataHeader");
 
-        String resultCode = (String) responseDataBody.get("result_cd");
+        String gwResultCode = (String) responseDataHeader.get("GW_RSLT_CD");
+        if (!"1200".equals(gwResultCode)) {
+            throw new TickettyAppApplicationException(ErrorCode.INTERNAL_SERVER_ERROR, "External API error with GW_RSLT_CD: " + gwResultCode);
+        }
+
+        Map<String, Object> responseDataBody = (Map<String, Object>) responseBody.get("dataBody");
+        String rspCd = (String) responseDataBody.get("rsp_cd");
+        String resultCd = (String) responseDataBody.get("result_cd");
+
+
+        if ("P000".equals(rspCd)) {
+            if (isInputValueError(resultCd)) {
+                throw new TickettyAppApplicationException(ErrorCode.INPUT_VALUE_ERROR, "Input value error with RESULT_CD: " + resultCd);
+            }
+
+            if (isServerError(resultCd)) {
+                throw new TickettyAppApplicationException(ErrorCode.INTERNAL_SERVER_ERROR, "Server error with RESULT_CD: " + resultCd);
+            }
+
+            if ("D999".equals(resultCd)) {
+                throw new TickettyAppApplicationException(ErrorCode.NOT_SERVICE_TIME, "Service not available with RESULT_CD: " + resultCd);
+            }
+        }
+
+        if (isInputValueError(rspCd)) {
+            throw new TickettyAppApplicationException(ErrorCode.INPUT_VALUE_ERROR, "Input value error with RSP_CD: " + rspCd);
+        }
+
+        if (isServerError(rspCd)) {
+            throw new TickettyAppApplicationException(ErrorCode.INTERNAL_SERVER_ERROR, "Server error with RSP_CD: " + rspCd);
+        }
 
         // 유저 테이블 계좌 정보 업데이트
         updateUserAccountInfo(userId, acctNo, bnkCd, name);
 
-        return new Response<>(resultCode, null);
+        return new Response<>("SUCCESS", null);
+    }
+
+    private boolean isInputValueError(String code) {
+        return Arrays.asList("P001", "P005", "S700", "S315", "L399", "DB01", "D900", "D103", "D105", "B004", "B102", "B103", "B104", "S606").contains(code);
+    }
+
+    private boolean isServerError(String code) {
+        return Arrays.asList("P013", "S691", "E998", "E999", "TIME", "DSYS", "OVER", "D888", "B101", "B199").contains(code) || code.startsWith("E");
     }
 
     private void updateUserAccountInfo(Integer userId, String accountNumber, String bankName, String accountHolder) {
