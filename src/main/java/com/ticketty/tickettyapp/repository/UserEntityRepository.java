@@ -38,15 +38,15 @@ public interface UserEntityRepository extends JpaRepository<UserEntity, Integer>
     @Query("UPDATE UserEntity u SET u.emoji = :emoji WHERE u.id = :userId")
     void updateEmojiById(@Param("userId") Integer userId, @Param("emoji") String emoji);
 
-    @Modifying
-    @Query("UPDATE UserEntity u SET u.accountNumber = :accountNumber, u.bankName = :bankName, u.accountHolder = :accountHolder, u.accountRegisteredAt = :accountRegisteredAt WHERE u.id = :userId")
-    void updateAccountInfo(
-            @Param("userId") Integer userId,
-            @Param("accountNumber") String accountNumber,
-            @Param("bankName") String bankName,
-            @Param("accountHolder") String accountHolder,
-            @Param("accountRegisteredAt") Timestamp accountRegisteredAt
-    );
+//    @Modifying
+//    @Query("UPDATE UserEntity u SET u.accountNumber = :accountNumber, u.bankName = :bankName, u.accountHolder = :accountHolder, u.accountRegisteredAt = :accountRegisteredAt WHERE u.id = :userId")
+//    void updateAccountInfo(
+//            @Param("userId") Integer userId,
+//            @Param("accountNumber") String accountNumber,
+//            @Param("bankName") String bankName,
+//            @Param("accountHolder") String accountHolder,
+//            @Param("accountRegisteredAt") Timestamp accountRegisteredAt
+//    );
 
     boolean existsByBankNameAndAccountNumber(String bankName, String accountNumber);
 

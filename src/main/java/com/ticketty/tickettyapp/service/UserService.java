@@ -309,7 +309,7 @@ public class UserService {
         }
 
         // 유저 테이블 계좌 정보 업데이트
-        updateUserAccountInfo(userId, acctNo, bnkCd, name);
+//        updateUserAccountInfo(userId, acctNo, bnkCd, name);
 
         return new Response<>("SUCCESS", null);
     }
@@ -322,10 +322,10 @@ public class UserService {
         return Arrays.asList("P013", "S691", "E998", "E999", "TIME", "DSYS", "OVER", "D888", "B101", "B199").contains(code) || code.startsWith("E");
     }
 
-    private void updateUserAccountInfo(Integer userId, String accountNumber, String bankName, String accountHolder) {
-        Timestamp accountRegisteredAt = Timestamp.from(Instant.now());
-        userEntityRepository.updateAccountInfo(userId, accountNumber, bankName, accountHolder, accountRegisteredAt);
-    }
+//    private void updateUserAccountInfo(Integer userId, String accountNumber, String bankName, String accountHolder) {
+//        Timestamp accountRegisteredAt = Timestamp.from(Instant.now());
+//        userEntityRepository.updateAccountInfo(userId, accountNumber, bankName, accountHolder, accountRegisteredAt);
+//    }
 
     private String getAccessToken() {
         HttpHeaders headers = new HttpHeaders();
