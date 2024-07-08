@@ -16,6 +16,7 @@ public enum ErrorCode {
 
 
     NULL_INPUT(HttpStatus.BAD_REQUEST,"입력값이 null이면 안됩니다."),
+    MISSING_REQUIRED_PARAMETER(HttpStatus.BAD_REQUEST,"빈 값이 있으면 안됩니다."),
 
     EMAIL_VALIDATION(HttpStatus.OK, "Email validation failed"),
     PASSWORD_VALIDATION(HttpStatus.OK, "Password validation failed"),
@@ -53,6 +54,11 @@ public enum ErrorCode {
     WINNER_NOT_FOUND(HttpStatus.OK, "No winner found today"),
 
     NOT_TICKET_ISSUE_TIME(HttpStatus.OK, "This is not the time to issue tickets."),
+
+    ALREADY_REGISTERED_ACCOUNT(HttpStatus.OK, "Account information for this user is already registered with the same values."),
+    DUPLICATED_ACCOUNT(HttpStatus.OK, "This account is already registered in database."),
+    INPUT_VALUE_ERROR(HttpStatus.OK, ""),
+    NOT_SERVICE_TIME(HttpStatus.OK, ""),
     ;
 
     private HttpStatus status;

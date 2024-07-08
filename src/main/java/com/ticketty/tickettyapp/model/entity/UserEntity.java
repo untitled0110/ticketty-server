@@ -35,13 +35,13 @@ public class UserEntity {
     private String phone;
 
     @Column(name = "account_number")
-    private String account_number;
+    private String accountNumber;
 
     @Column(name = "bank_name")
-    private String bank_name;
+    private String bankName;
 
     @Column(name = "account_holder")
-    private String account_holder;
+    private String accountHolder;
 
     @Column(name = "emoji")
     private String emoji;
@@ -58,6 +58,9 @@ public class UserEntity {
 
     @Column(name = "deleted_at")
     private Timestamp deletedAt;
+
+    @Column(name = "account_registered_at")
+    private Timestamp accountRegisteredAt;
 
     @PrePersist
     void registeredAt() {
