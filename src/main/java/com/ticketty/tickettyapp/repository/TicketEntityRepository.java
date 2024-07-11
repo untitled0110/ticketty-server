@@ -18,10 +18,10 @@ public interface TicketEntityRepository extends JpaRepository<TicketEntity, Inte
 
     int countByUser_IdAndRegisteredAtBetween(Integer userId, Timestamp start, Timestamp end);
 
-    @Query("SELECT t.user.id, t.user.nickname, COUNT(t) as ticketCount, MAX(t.registeredAt) as latestCreatedAt " +
+    @Query("SELECT t.user.id, t.user.nickname, t.user.emoji, COUNT(t) as ticketCount, MAX(t.registeredAt) as latestCreatedAt " +
             "FROM TicketEntity t " +
             "WHERE t.registeredAt BETWEEN :start AND :end " +
-            "GROUP BY t.user.id, t.user.nickname " +
+            "GROUP BY t.user.id, t.user.nickname, t.user.emoji " +
             "ORDER BY ticketCount DESC, MAX(t.registeredAt) DESC")
     List<Object[]> findTop10UsersByTicketCount(Timestamp start, Timestamp end, Pageable pageable);
 

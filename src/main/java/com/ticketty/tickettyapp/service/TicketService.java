@@ -150,9 +150,10 @@ public class TicketService {
         return topUsers.stream()
                 .map(record -> new UserTicketRankingResponse(
                         (Integer) record[0],  // userId
-                        (Long) record[2],     // ticketCount
+                        (Long) record[3],     // ticketCount
                         (String) record[1],   // nickname
-                        (Timestamp) record[3] // latestCreatedAt
+                        (String) record[2],   // emoji
+                        (Timestamp) record[4] // latestCreatedAt
                 ))
                 .collect(Collectors.toList());
     }

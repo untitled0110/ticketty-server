@@ -13,5 +13,6 @@ public class UserTicketRankingResponse {
     private Integer userId;
     private Long ticketCount;
     private String nickname;
+    private String emoji;
     private Timestamp latestCreatedAt;
 }
