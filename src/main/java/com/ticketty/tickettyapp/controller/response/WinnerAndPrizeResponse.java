@@ -19,6 +19,7 @@ public class WinnerAndPrizeResponse {
 
     @JsonFormat(pattern = "yyyy-MM-dd")
     private Timestamp winningDate;
+    private String emoji;
 
     public WinnerAndPrizeResponse() {
 
