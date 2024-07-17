@@ -4,14 +4,17 @@ import com.ticketty.tickettyapp.controller.response.WinnerAndPrizeResponse;
 import com.ticketty.tickettyapp.controller.response.WinnerHistoryResponse;
 import com.ticketty.tickettyapp.exception.ErrorCode;
 import com.ticketty.tickettyapp.exception.TickettyAppApplicationException;
+import com.ticketty.tickettyapp.model.WinnerStatus;
 import com.ticketty.tickettyapp.model.entity.WinnerEntity;
 import com.ticketty.tickettyapp.repository.WinnerEntityRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
@@ -74,6 +77,31 @@ public class WinnerService {
                 winner.getPrizeMoney(),
                 winner.getUser().getId()
         )).collect(Collectors.toList());
+    }
+
+
+    @Transactional
+    public void updateWinnerStatus(Integer winnerId, Integer userId, WinnerStatus status) {
+
+        WinnerEntity winner = winnerEntityRepository.findById(winnerId)
+                .orElseThrow(() -> new TickettyAppApplicationException(ErrorCode.WINNER_NOT_FOUND));
+
+        if (!winner.getUser().getId().equals(userId)) {
+            throw new TickettyAppApplicationException(ErrorCode.UNAUTHORIZED_USER, "User not authorized to update this winner status");
+        }
+
+        if (winner.getStatus() == status) {
+            throw new TickettyAppApplicationException(ErrorCode.ALREADY_REGISTERED_STATUS, "Status is already " + status);
+        }
+
+        winner.setStatus(status);
+        if (status == WinnerStatus.REQUEST_COMPLETED) {
+            winner.setRequestedAt(Timestamp.from(Instant.now()));
+        }
+        if (status == WinnerStatus.PAYMENT_COMPLETED) {
+            winner.setPayedAt(Timestamp.from(Instant.now()));
+        }
+        winnerEntityRepository.save(winner);
     }
 
 }
