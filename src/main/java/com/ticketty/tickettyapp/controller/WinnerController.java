@@ -40,9 +40,10 @@ public class WinnerController {
         return Response.success(winnerHistory);
     }
 
-    @PatchMapping("/winners/{id}/status")
+    @PatchMapping("/winners/{winnerId}/status")
     public Response<Void> updateWinnerStatus(
-            @PathVariable Integer id,
+            HttpServletRequest httpServletRequest,
+            @PathVariable Integer winnerId,
             @Valid @RequestBody WinnerStatusUpdateRequest statusUpdateRequest,
             Errors errors) {
 
@@ -51,8 +52,10 @@ public class WinnerController {
             throw new TickettyAppApplicationException(ErrorCode.INVALID_STATUS_VALUE, (errorMessage));
         }
 
+        Integer userId = (Integer) httpServletRequest.getAttribute("userId");
+
         WinnerStatus status = WinnerStatus.valueOf(statusUpdateRequest.getStatus());
-        winnerService.updateWinnerStatus(id, status);
+        winnerService.updateWinnerStatus(winnerId, userId, status);
         return Response.success(null);
     }
 

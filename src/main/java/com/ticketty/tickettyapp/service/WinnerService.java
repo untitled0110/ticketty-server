@@ -79,11 +79,21 @@ public class WinnerService {
         )).collect(Collectors.toList());
     }
 
-    @Transactional
-    public void updateWinnerStatus(Integer id, WinnerStatus status) {
 
-        WinnerEntity winner = winnerEntityRepository.findById(id)
+    @Transactional
+    public void updateWinnerStatus(Integer winnerId, Integer userId, WinnerStatus status) {
+
+        WinnerEntity winner = winnerEntityRepository.findById(winnerId)
                 .orElseThrow(() -> new TickettyAppApplicationException(ErrorCode.WINNER_NOT_FOUND));
+
+        if (!winner.getUser().getId().equals(userId)) {
+            throw new TickettyAppApplicationException(ErrorCode.UNAUTHORIZED_USER, "User not authorized to update this winner status");
+        }
+
+        if (winner.getStatus() == status) {
+            throw new TickettyAppApplicationException(ErrorCode.ALREADY_REGISTERED_STATUS, "Status is already " + status);
+        }
+
         winner.setStatus(status);
         if (status == WinnerStatus.REQUEST_COMPLETED) {
             winner.setRequestedAt(Timestamp.from(Instant.now()));
@@ -93,4 +103,5 @@ public class WinnerService {
         }
         winnerEntityRepository.save(winner);
     }
+
 }
