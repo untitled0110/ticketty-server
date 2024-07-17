@@ -6,6 +6,7 @@ import com.ticketty.tickettyapp.controller.response.PresentUserTicketCountRespon
 import com.ticketty.tickettyapp.controller.response.UserTicketRankingResponse;
 import com.ticketty.tickettyapp.exception.ErrorCode;
 import com.ticketty.tickettyapp.exception.TickettyAppApplicationException;
+import com.ticketty.tickettyapp.model.WinnerStatus;
 import com.ticketty.tickettyapp.model.entity.TicketEntity;
 import com.ticketty.tickettyapp.model.entity.UserEntity;
 import com.ticketty.tickettyapp.model.entity.WinnerEntity;
@@ -77,6 +78,7 @@ public class TicketService {
             winner.setTicket(winningTicket);
             winner.setPrizeMoney(prizeAmount);
             winner.setUser(winningTicket.getUser()); // 티켓 소유자를 당첨자로 설정
+            winner.setStatus(WinnerStatus.BEFORE_REQUEST);
             winnerEntityRepository.save(winner);
         } else {
             System.out.println("당일 발급된 티켓이 없습니다.");

@@ -1,17 +1,21 @@
 package com.ticketty.tickettyapp.service;
 
 import com.ticketty.tickettyapp.controller.response.WinnerAndPrizeResponse;
+import com.ticketty.tickettyapp.controller.response.WinnerHistoryResponse;
 import com.ticketty.tickettyapp.exception.ErrorCode;
 import com.ticketty.tickettyapp.exception.TickettyAppApplicationException;
 import com.ticketty.tickettyapp.model.entity.WinnerEntity;
 import com.ticketty.tickettyapp.repository.WinnerEntityRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -58,4 +62,18 @@ public class WinnerService {
         }
         return response;
     }
+
+
+    public List<WinnerHistoryResponse> getWinnerHistoryByUserId(Integer userId, int page, int count) {
+        Pageable pageable = PageRequest.of(page, count);
+        List<WinnerEntity> winners = winnerEntityRepository.findByUserId(userId, pageable).getContent();
+        return winners.stream().map(winner -> new WinnerHistoryResponse(
+                winner.getId(),
+                winner.getRegisteredAt(),
+                winner.getStatus().name(),
+                winner.getPrizeMoney(),
+                winner.getUser().getId()
+        )).collect(Collectors.toList());
+    }
+
 }

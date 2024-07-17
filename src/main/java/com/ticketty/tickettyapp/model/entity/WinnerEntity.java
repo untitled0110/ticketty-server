@@ -1,5 +1,6 @@
 package com.ticketty.tickettyapp.model.entity;
 
+import com.ticketty.tickettyapp.model.WinnerStatus;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.SQLDelete;
@@ -32,6 +33,10 @@ public class WinnerEntity {
     @Column(name = "prize_money", nullable = false)
     private Integer prizeMoney;
 
+    @Column(name = "status", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private WinnerStatus status;
+
     @Column(name = "registered_at")
     private Timestamp registeredAt;
 
@@ -44,12 +49,13 @@ public class WinnerEntity {
     @PrePersist
     void registeredAt() {
         this.registeredAt = Timestamp.from(Instant.now());
+        if (this.status == null) {
+            this.status = WinnerStatus.BEFORE_REQUEST;
+        }
     }
 
     @PreUpdate
     void updatedAt() {
         this.updatedAt = Timestamp.from(Instant.now());
     }
-
-
 }

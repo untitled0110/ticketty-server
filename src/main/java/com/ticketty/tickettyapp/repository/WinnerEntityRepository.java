@@ -1,6 +1,8 @@
 package com.ticketty.tickettyapp.repository;
 
 import com.ticketty.tickettyapp.model.entity.WinnerEntity;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -18,4 +20,6 @@ public interface WinnerEntityRepository extends JpaRepository<WinnerEntity, Inte
     @Query("SELECT w FROM WinnerEntity w JOIN FETCH w.user WHERE w.registeredAt BETWEEN :startOfDay AND :endOfDay")
     List<WinnerEntity> findByRegisteredAtBetween(@Param("startOfDay") Timestamp startOfDay, @Param("endOfDay") Timestamp endOfDay);
 
+    @Query("SELECT w FROM WinnerEntity w WHERE w.user.id = :userId")
+    Page<WinnerEntity> findByUserId(@Param("userId") Integer userId, Pageable pageable);
 }
