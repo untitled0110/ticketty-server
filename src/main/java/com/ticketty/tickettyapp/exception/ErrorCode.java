@@ -59,6 +59,8 @@ public enum ErrorCode {
     DUPLICATED_ACCOUNT(HttpStatus.OK, "This account is already registered in database."),
     INPUT_VALUE_ERROR(HttpStatus.OK, ""),
     NOT_SERVICE_TIME(HttpStatus.OK, ""),
+
+    INVALID_STATUS_VALUE(HttpStatus.OK, "Invalid status value")
     ;
 
     private HttpStatus status;

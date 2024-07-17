@@ -1,17 +1,21 @@
 package com.ticketty.tickettyapp.controller;
 
+import com.ticketty.tickettyapp.controller.request.WinnerStatusUpdateRequest;
 import com.ticketty.tickettyapp.controller.response.Response;
 import com.ticketty.tickettyapp.controller.response.WinnerAndPrizeResponse;
 import com.ticketty.tickettyapp.controller.response.WinnerHistoryResponse;
+import com.ticketty.tickettyapp.exception.ErrorCode;
+import com.ticketty.tickettyapp.exception.TickettyAppApplicationException;
+import com.ticketty.tickettyapp.model.WinnerStatus;
 import com.ticketty.tickettyapp.service.WinnerService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.validation.Errors;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 import java.util.List;
+import java.util.Objects;
 
 @RestController
 @RequiredArgsConstructor
@@ -20,13 +24,13 @@ public class WinnerController {
 
     private final WinnerService winnerService;
 
-    @GetMapping("/winners")
+    @GetMapping("/winner/today")
     public Response<WinnerAndPrizeResponse> getTodayWinnerAndPrize() {
 
         return Response.success(winnerService.getTodayWinnerAndPrize());
     }
 
-    @GetMapping("/winnings")
+    @GetMapping("/winners")
     public Response<List<WinnerHistoryResponse>> getWinnerHistory(HttpServletRequest httpServletRequest,
                                                                   @RequestParam int page,
                                                                   @RequestParam int count) {
@@ -35,4 +39,21 @@ public class WinnerController {
         List<WinnerHistoryResponse> winnerHistory = winnerService.getWinnerHistoryByUserId(userId, page, count);
         return Response.success(winnerHistory);
     }
+
+    @PatchMapping("/winners/{id}/status")
+    public Response<Void> updateWinnerStatus(
+            @PathVariable Integer id,
+            @Valid @RequestBody WinnerStatusUpdateRequest statusUpdateRequest,
+            Errors errors) {
+
+        if (errors.hasErrors()) {
+            String errorMessage = Objects.requireNonNull(errors.getFieldError("status")).getDefaultMessage();
+            throw new TickettyAppApplicationException(ErrorCode.INVALID_STATUS_VALUE, (errorMessage));
+        }
+
+        WinnerStatus status = WinnerStatus.valueOf(statusUpdateRequest.getStatus());
+        winnerService.updateWinnerStatus(id, status);
+        return Response.success(null);
+    }
+
 }

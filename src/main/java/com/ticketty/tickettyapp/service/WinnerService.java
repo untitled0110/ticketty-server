@@ -4,14 +4,17 @@ import com.ticketty.tickettyapp.controller.response.WinnerAndPrizeResponse;
 import com.ticketty.tickettyapp.controller.response.WinnerHistoryResponse;
 import com.ticketty.tickettyapp.exception.ErrorCode;
 import com.ticketty.tickettyapp.exception.TickettyAppApplicationException;
+import com.ticketty.tickettyapp.model.WinnerStatus;
 import com.ticketty.tickettyapp.model.entity.WinnerEntity;
 import com.ticketty.tickettyapp.repository.WinnerEntityRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
@@ -76,4 +79,18 @@ public class WinnerService {
         )).collect(Collectors.toList());
     }
 
+    @Transactional
+    public void updateWinnerStatus(Integer id, WinnerStatus status) {
+
+        WinnerEntity winner = winnerEntityRepository.findById(id)
+                .orElseThrow(() -> new TickettyAppApplicationException(ErrorCode.WINNER_NOT_FOUND));
+        winner.setStatus(status);
+        if (status == WinnerStatus.REQUEST_COMPLETED) {
+            winner.setRequestedAt(Timestamp.from(Instant.now()));
+        }
+        if (status == WinnerStatus.PAYMENT_COMPLETED) {
+            winner.setPayedAt(Timestamp.from(Instant.now()));
+        }
+        winnerEntityRepository.save(winner);
+    }
 }
