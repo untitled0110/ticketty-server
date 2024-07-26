@@ -5,6 +5,7 @@ import com.ticketty.tickettyapp.controller.response.WinnerHistoryResponse;
 import com.ticketty.tickettyapp.exception.ErrorCode;
 import com.ticketty.tickettyapp.exception.TickettyAppApplicationException;
 import com.ticketty.tickettyapp.model.WinnerStatus;
+import com.ticketty.tickettyapp.model.entity.UserEntity;
 import com.ticketty.tickettyapp.model.entity.WinnerEntity;
 import com.ticketty.tickettyapp.repository.WinnerEntityRepository;
 import lombok.RequiredArgsConstructor;
@@ -107,19 +108,29 @@ public class WinnerService {
             throw new TickettyAppApplicationException(ErrorCode.ALREADY_REGISTERED_STATUS, "Status is already " + status);
         }
 
-        winner.setStatus(status);
         if (status == WinnerStatus.REQUEST_COMPLETED) {
+            UserEntity user = winner.getUser();
+            if (user.getAccountNumber() == null || user.getAccountNumber().trim().isEmpty() ||
+                    user.getBankName() == null || user.getBankName().trim().isEmpty() ||
+                    user.getAccountHolder() == null || user.getAccountHolder().trim().isEmpty()) {
+                throw new TickettyAppApplicationException(ErrorCode.MISSING_ACCOUNT_INFORMATION);
+            }
+
             Timestamp requestedAt = Timestamp.from(Instant.now());
             winner.setRequestedAt(requestedAt);
-            sendDiscordWebhook(winnerId, userId, requestedAt, winner.getPrizeMoney());
+            sendDiscordWebhook(winnerId, userId, requestedAt, winner);
         }
+
         if (status == WinnerStatus.PAYMENT_COMPLETED) {
             winner.setPayedAt(Timestamp.from(Instant.now()));
         }
+
+        winner.setStatus(status);
         winnerEntityRepository.save(winner);
     }
 
-    private void sendDiscordWebhook(Integer winnerId, Integer userId, Timestamp requestedAt, Integer prizeMoney) {
+
+    private void sendDiscordWebhook(Integer winnerId, Integer userId, Timestamp requestedAt, WinnerEntity winner) {
 
         Map<String, Object> body = new HashMap<>();
         body.put("content", "입금요청");
@@ -141,10 +152,26 @@ public class WinnerService {
 
         Map<String, Object> field4 = new HashMap<>();
         field4.put("name", "Prize Money");
-        field4.put("value", prizeMoney.toString());
+        field4.put("value", winner.getPrizeMoney().toString());
+
+        Map<String, Object> field5 = new HashMap<>();
+        field5.put("name", "Nickname");
+        field5.put("value", winner.getUser().getNickname());
+
+        Map<String, Object> field6 = new HashMap<>();
+        field6.put("name", "Account Number");
+        field6.put("value", winner.getUser().getAccountNumber());
+
+        Map<String, Object> field7 = new HashMap<>();
+        field7.put("name", "Bank Name");
+        field7.put("value", winner.getUser().getBankName());
+
+        Map<String, Object> field8 = new HashMap<>();
+        field8.put("name", "Account Holder");
+        field8.put("value", winner.getUser().getAccountHolder());
 
         Map<String, Object> embed = new HashMap<>();
-        embed.put("fields", List.of(field1, field2, field3, field4));
+        embed.put("fields", List.of(field1, field2, field3, field4, field5, field6, field7, field8));
 
         body.put("embeds", List.of(embed));
 
@@ -157,3 +184,4 @@ public class WinnerService {
     }
 
 }
+

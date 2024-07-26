@@ -63,6 +63,7 @@ public enum ErrorCode {
     INVALID_STATUS_VALUE(HttpStatus.OK, "Invalid status value"),
     ALREADY_REGISTERED_STATUS(HttpStatus.OK, "Already registered status"),
     UNAUTHORIZED_USER(HttpStatus.OK, "User not authorized to update this winner status"),
+    MISSING_ACCOUNT_INFORMATION(HttpStatus.OK, "Missing account information"),
     ;
 
     private HttpStatus status;
