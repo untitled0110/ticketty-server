@@ -52,6 +52,9 @@ public class WinnerEntity {
     @Column(name = "payed_at")
     private Timestamp payedAt;
 
+    @Column(name = "canceled_at")
+    private Timestamp canceledAt;
+
     @PrePersist
     void registeredAt() {
         this.registeredAt = Timestamp.from(Instant.now());
