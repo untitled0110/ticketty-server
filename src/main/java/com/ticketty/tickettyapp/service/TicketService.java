@@ -50,40 +50,57 @@ public class TicketService {
         return new IssueTicketResponse(ticketEntity.getId(), user.getId());
     }
 
-    @Transactional
-//    @Scheduled(cron = "0 33 15 * * ?")
-    @Scheduled(cron = "0 0 21 * * ?") // 매일 오후 9시에 실행
-    public void selectWinningTicketAndCalculatePrize() {
-        LocalDateTime yesterdayTenPM = LocalDateTime.now().minusDays(1).withHour(22).withMinute(0).withSecond(0);
-        LocalDateTime todayNinePM = LocalDateTime.now().withHour(21).withMinute(0).withSecond(0);
+@Transactional
+@Scheduled(cron = "0 0 21 * * ?") // 매일 오후 9시에 실행
+public void selectWinningTicketAndCalculatePrize() {
+    LocalDateTime yesterdayTenPM = LocalDateTime.now().minusDays(1).withHour(22).withMinute(0).withSecond(0);
+    LocalDateTime todayNinePM = LocalDateTime.now().withHour(21).withMinute(0).withSecond(0);
 
-        Timestamp startOfDay = Timestamp.valueOf(yesterdayTenPM);
-        Timestamp endOfDay = Timestamp.valueOf(todayNinePM);
+    Timestamp startOfDay = Timestamp.valueOf(yesterdayTenPM);
+    Timestamp endOfDay = Timestamp.valueOf(todayNinePM);
 
-        List<TicketEntity> todayTickets = ticketEntityRepository.findByRegisteredAtBetween(startOfDay, endOfDay);
-        int totalTickets = todayTickets.size();
+    List<TicketEntity> todayTickets = ticketEntityRepository.findByRegisteredAtBetween(startOfDay, endOfDay);
+    int totalTickets = todayTickets.size();
 
-        if (totalTickets > 0) {
-            // 당첨금 계산
-            int prizeAmount = totalTickets + defaultPrizeAmount; // 티켓 1장당 1원 + 기본 금액
-            System.out.println("당첨금: " + prizeAmount + "원");
+    LocalDateTime yesterdayStartOfDay = LocalDateTime.now().minusDays(1).toLocalDate().atStartOfDay();
+    LocalDateTime yesterdayEndOfDay = yesterdayStartOfDay.withHour(23).withMinute(59).withSecond(59);
 
-            // 당첨 티켓 선정
-            Random random = new Random();
-            TicketEntity winningTicket = todayTickets.get(random.nextInt(totalTickets));
-            System.out.println("당첨 티켓: " + winningTicket.getId());
+    Timestamp startOfDay2 = Timestamp.valueOf(yesterdayStartOfDay);
+    Timestamp endOfDay2 = Timestamp.valueOf(yesterdayEndOfDay);
 
-            // 당첨자 정보 저장
-            WinnerEntity winner = new WinnerEntity();
-            winner.setTicket(winningTicket);
-            winner.setPrizeMoney(prizeAmount);
-            winner.setUser(winningTicket.getUser()); // 티켓 소유자를 당첨자로 설정
-            winner.setStatus(WinnerStatus.BEFORE_REQUEST);
-            winnerEntityRepository.save(winner);
-        } else {
-            System.out.println("당일 발급된 티켓이 없습니다.");
-        }
+    // 어제의 WinnerEntity 중 status가 WINNING_CANCELLED인 엔티티를 찾기
+    List<WinnerEntity> cancelledWinners = winnerEntityRepository.findByRegisteredAtBetweenAndStatus(startOfDay2, endOfDay2, WinnerStatus.WINNING_CANCELLED);
+    int cancelledPrizeAmount = cancelledWinners.stream().mapToInt(WinnerEntity::getPrizeMoney).sum();
+
+    // 기본 당첨금 계산
+//    int prizeAmount = totalTickets + defaultPrizeAmount;
+//
+//    List<WinnerEntity> cancelledWinners = winnerEntityRepository.findByRegisteredAtBetweenAndStatus(startOfDay, endOfDay, WinnerStatus.WINNING_CANCELLED);
+//    for (WinnerEntity cancelledWinner : cancelledWinners) {
+//        prizeAmount += cancelledWinner.getPrizeMoney(); // 취소된 당첨자의 prizeMoney를 현재 prizeAmount에 추가
+//    }
+
+    if (totalTickets > 0) {
+        // 당첨금 계산
+        int prizeAmount = totalTickets + defaultPrizeAmount + cancelledPrizeAmount; // 티켓 1장당 1원 + 기본 금액 + 취소된 당첨금
+        System.out.println("당첨금: " + prizeAmount + "원");
+
+        // 당첨 티켓 선정
+        Random random = new Random();
+        TicketEntity winningTicket = todayTickets.get(random.nextInt(totalTickets));
+        System.out.println("당첨 티켓: " + winningTicket.getId());
+
+        // 당첨자 정보 저장
+        WinnerEntity winner = new WinnerEntity();
+        winner.setTicket(winningTicket);
+        winner.setPrizeMoney(prizeAmount);
+        winner.setUser(winningTicket.getUser()); // 티켓 소유자를 당첨자로 설정
+        winner.setStatus(WinnerStatus.BEFORE_REQUEST);
+        winnerEntityRepository.save(winner);
+    } else {
+        System.out.println("당일 발급된 티켓이 없습니다.");
     }
+}
 
     private Timestamp[] setDayBoundaries(LocalDateTime currentTime) {
         LocalDateTime startOfDay;

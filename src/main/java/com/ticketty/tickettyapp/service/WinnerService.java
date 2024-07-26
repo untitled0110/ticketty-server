@@ -17,6 +17,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
@@ -24,6 +25,7 @@ import org.springframework.web.client.RestTemplate;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.HashMap;
 import java.util.List;
@@ -183,6 +185,25 @@ public class WinnerService {
         HttpEntity<Map<String, Object>> request = new HttpEntity<>(body, headers);
 
         restTemplate.postForEntity(discordWebhookUrl, request, String.class);
+    }
+
+    @Transactional
+    @Scheduled(cron = "0 0 20 * * ?") // 매일 오후 8시에 실행
+    public void cancelUnrequestedWinners() {
+        LocalDateTime yesterdayStart = LocalDate.now().minusDays(1).atTime(LocalTime.of(0, 0));
+        LocalDateTime yesterdayEnd = LocalDate.now().minusDays(1).atTime(LocalTime.of(23, 59, 59));
+
+        Timestamp startOfDay = Timestamp.valueOf(yesterdayStart);
+        Timestamp endOfDay = Timestamp.valueOf(yesterdayEnd);
+
+        List<WinnerEntity> unrequestedWinners = winnerEntityRepository.findByRegisteredAtBetweenAndStatus(startOfDay, endOfDay, WinnerStatus.BEFORE_REQUEST);
+
+        unrequestedWinners.forEach(winner -> {
+            winner.setStatus(WinnerStatus.WINNING_CANCELLED);
+            winner.setCanceledAt(Timestamp.from(Instant.now()));
+        });
+
+        winnerEntityRepository.saveAll(unrequestedWinners);
     }
 
 }
