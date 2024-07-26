@@ -80,10 +80,6 @@ public void selectWinningTicketAndCalculatePrize() {
 //        prizeAmount += cancelledWinner.getPrizeMoney(); // 취소된 당첨자의 prizeMoney를 현재 prizeAmount에 추가
 //    }
 
-//    System.out.println("totalTickets : " + totalTickets);
-//    System.out.println("cancelledWinners : " + cancelledWinners);
-//    System.out.println("cancelledPrizeAmount : " + cancelledPrizeAmount);
-
     if (totalTickets > 0) {
         // 당첨금 계산
         int prizeAmount = totalTickets + defaultPrizeAmount + cancelledPrizeAmount; // 티켓 1장당 1원 + 기본 금액 + 취소된 당첨금

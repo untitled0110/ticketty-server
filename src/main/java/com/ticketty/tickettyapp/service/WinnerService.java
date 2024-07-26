@@ -188,7 +188,6 @@ public class WinnerService {
     }
 
     @Transactional
-//    @Scheduled(cron = "0 43 23 * * ?")
     @Scheduled(cron = "0 0 20 * * ?") // 매일 오후 8시에 실행
     public void cancelUnrequestedWinners() {
         LocalDateTime yesterdayStart = LocalDate.now().minusDays(1).atTime(LocalTime.of(0, 0));

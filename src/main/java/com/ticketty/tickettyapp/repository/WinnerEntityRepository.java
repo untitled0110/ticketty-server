@@ -29,6 +29,4 @@ public interface WinnerEntityRepository extends JpaRepository<WinnerEntity, Inte
 //    @Query("SELECT w FROM WinnerEntity w WHERE w.registeredAt BETWEEN :startOfDay AND :endOfDay AND w.status = :status")
 //    List<WinnerEntity> findByRegisteredAtBetweenAndStatus(@Param("startOfDay") Timestamp startOfDay, @Param("endOfDay") Timestamp endOfDay, @Param("status") WinnerStatus status);
 
-    //List<WinnerEntity> findByRegisteredAtBetweenAndStatus(Timestamp start, Timestamp end, WinnerStatus status);
-
 }
