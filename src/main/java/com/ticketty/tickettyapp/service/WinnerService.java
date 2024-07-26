@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -83,7 +84,7 @@ public class WinnerService {
 
 
     public List<WinnerHistoryResponse> getWinnerHistoryByUserId(Integer userId, int page, int count) {
-        Pageable pageable = PageRequest.of(page, count);
+        Pageable pageable = PageRequest.of(page, count, Sort.by("registeredAt").descending());
         List<WinnerEntity> winners = winnerEntityRepository.findByUserId(userId, pageable).getContent();
         return winners.stream().map(winner -> new WinnerHistoryResponse(
                 winner.getId(),
@@ -93,6 +94,7 @@ public class WinnerService {
                 winner.getUser().getId()
         )).collect(Collectors.toList());
     }
+
 
     @Transactional
     public void updateWinnerStatus(Integer winnerId, Integer userId, WinnerStatus status) {

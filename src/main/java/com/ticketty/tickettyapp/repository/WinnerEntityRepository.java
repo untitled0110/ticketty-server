@@ -20,6 +20,6 @@ public interface WinnerEntityRepository extends JpaRepository<WinnerEntity, Inte
     @Query("SELECT w FROM WinnerEntity w JOIN FETCH w.user WHERE w.registeredAt BETWEEN :startOfDay AND :endOfDay")
     List<WinnerEntity> findByRegisteredAtBetween(@Param("startOfDay") Timestamp startOfDay, @Param("endOfDay") Timestamp endOfDay);
 
-    @Query("SELECT w FROM WinnerEntity w WHERE w.user.id = :userId")
+    @Query("SELECT w FROM WinnerEntity w WHERE w.user.id = :userId ORDER BY w.registeredAt DESC")
     Page<WinnerEntity> findByUserId(@Param("userId") Integer userId, Pageable pageable);
 }
